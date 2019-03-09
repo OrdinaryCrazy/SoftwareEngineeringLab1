@@ -5,7 +5,10 @@ This is a group project repository.
 
 * 总体思想：
 
+#### 3月9日讨论确定：
 
+1. 以字母为节点，单词为边
+2. 边的数据结构中要有data，wordweight，lengthweight，used，next几个域
 
 * 变量命名规范：
 
@@ -14,7 +17,20 @@ This is a group project repository.
 * 图的数据结构：
 
 ```c++
-
+struct edge{
+    string data;
+    int wordweight;
+	int lengthweight;
+    bool used;
+    char last;
+    struct edge * next;
+}
+typedef struct edge edge;
+struct node{
+    char ch;
+    edge* startEdges;
+}
+typedef struct node node;
 ```
 
 
