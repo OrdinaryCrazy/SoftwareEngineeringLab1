@@ -82,9 +82,31 @@ int main (int argc, char*argv[]){
     }
     std::vector<std::string> crudeData = sHoT::preprocessingData(crudeString);
 
-    if(fixedHead && head <= 'z' && head >= 'a'){
-        sHoT::findPathWithSpecifiedHead(sHoT::buildGraph(crudeData),argv[2][0]);
+    if(fixedHead && !fixedTail && head <= 'z' && head >= 'a'){
+        if(mostWord || (mostChar == false && mostWord == false)){
+            sHoT::findPathWithSpecifiedHead(sHoT::buildGraph(crudeData,true,true),head);
+        }
+        if(mostChar){
+            sHoT::findPathWithSpecifiedHead(sHoT::buildGraph(crudeData,false,true),head);
+        }
         sHoT::printSolution();
     }
-
+    if(!fixedHead && fixedTail && tail <= 'z' && tail >= 'a'){
+        if(mostWord || (mostChar == false && mostWord == false)){
+            sHoT::findPathWithSpecifiedTail(sHoT::buildGraph(crudeData,true,false),tail);
+        }
+        if(mostChar){
+            sHoT::findPathWithSpecifiedTail(sHoT::buildGraph(crudeData,false,false),tail);
+        }
+        sHoT::printSolution();
+    }
+    if(fixedHead && fixedTail && head <= 'z' && head >= 'a' && tail <= 'z' && tail >= 'a'){
+        if(mostWord || (mostChar == false && mostWord == false)){
+            sHoT::findPathWithSpecifiedHeadAndTail(sHoT::buildGraph(crudeData,true,true),head,tail);
+        }
+        if(mostChar){
+            sHoT::findPathWithSpecifiedHeadAndTail(sHoT::buildGraph(crudeData,false,true),head,tail);
+        }
+        sHoT::printSolution();
+    }
 }
