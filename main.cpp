@@ -2,10 +2,11 @@
 // Contributor: DaiLu, WangHaoyu, ZhangJingtun
 // Last modified: 20190310 10:22
 #include "specifiedHeadOrTail.h"
+#include "specifiedWordNumbers.h"
 #include "wang.h"
 #include <iostream>
 #include <algorithm>
-#include <vector>
+#include <vector> 
 #include <stdio.h>
 #include <stdlib.h>
 #include <fstream>
@@ -108,5 +109,8 @@ int main (int argc, char*argv[]){
             sHoT::findPathWithSpecifiedHeadAndTail(sHoT::buildGraph(crudeData,false,true),head,tail);
         }
         sHoT::printSolution();
+    }
+    if(fixedWordNum){
+        sWN::request4(crudeData, wordNum);
     }
 }
