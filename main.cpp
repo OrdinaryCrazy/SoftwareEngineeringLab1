@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <vector>
 #include <stdio.h>
+#include <fstream>
 namespace wang{
 struct node{
     int weight;
@@ -13,7 +14,7 @@ struct node{
     std::string *data;
     struct node *next;
     char lastChar;
-} ;
+};
 // 有向图的节点定义
 node *graph[26];
 // 有向图的邻接链表表示
@@ -28,7 +29,6 @@ void makeGraph(std::vector<std::string> s,int type){
     for (int i=0;i<26;i++){
         graph[i]=(node *) malloc(sizeof(node));
         graph[i]->next=NULL;
-        graph[i]->lastChar=i+'a';
     }// 生成头节点
     for (int i=0;i<s.size();i++){
         node* temp=(node *) malloc(sizeof(node));
@@ -87,8 +87,9 @@ void search(){
         }
     }
     // 对所有的节点进行深度优先搜索
+    std::ofstream mycout("solution.txt");
     for (int i=0;i<longestList.size();i++){
-        std::cout<<longestList[i]<<std::endl;
+        mycout<<longestList[i]<<std::endl;
     }
     // 输出最长的单词链
 }
