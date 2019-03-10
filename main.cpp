@@ -18,7 +18,57 @@ int main (int argc, char*argv[]){
     using namespace wang;
     using namespace std;
 
-    ifstream inFile(argv[argc - 1]);
+    bool mostChar = false;
+    bool mostWord = false;
+    bool fixedWordNum = false;
+    bool fixedHead = false;
+    bool fixedTail = false;
+    bool getInputFile = false;
+    int wordNum;
+    std::string inputFile;
+    char head,tail;
+
+    for(int i = 0;i < argc;i++){
+        switch (argv[i][0]){
+            case '-':
+                switch (argv[i][1]){
+                    case 'w':
+                        mostWord = true;
+                        getInputFile = true;
+                        inputFile = std::string(argv[i + 1]);
+                        break;
+                    case 'c':
+                        mostChar = true;
+                        getInputFile = true;
+                        inputFile = std::string(argv[i + 1]);
+                        break;
+                    case 'h':
+                        fixedHead = true;
+                        head = argv[i + 1][0];
+                        break;
+                    case 't':
+                        fixedTail = true;
+                        tail = argv[i + 1][0];
+                        break;
+                    case 'n':
+                        fixedWordNum = true;
+                        wordNum = stoi(std::string(argv[i + 1]));
+                        break;
+                    default:
+                        std::cout<< "invalid option." <<std::endl;
+                        break;
+                }
+                break;
+        
+            default:
+                break;
+        }
+    }
+    if(getInputFile == false){
+        std::cout<<"Please give input file name."<<std::endl;
+        exit(0);
+    }
+    ifstream inFile(inputFile);
     if(!inFile){
         std::cout<<"Can not open data file."<<std::endl;
         exit(0);
@@ -31,10 +81,10 @@ int main (int argc, char*argv[]){
         crudeString.append(" ");
     }
     std::vector<std::string> crudeData = sHoT::preprocessingData(crudeString);
-    // for(int i = 0;i < crudeData.size();i++)
-    //     std::cout<<crudeData[i]<<std::endl;
-    if(strcmp(argv[1],"-h") == 0 && strlen(argv[2]) == 1 && argv[2][0] <= 'z' && argv[2][0] >= 'a'){
+
+    if(fixedHead && head <= 'z' && head >= 'a'){
         sHoT::findPathWithSpecifiedHead(sHoT::buildGraph(crudeData),argv[2][0]);
         sHoT::printSolution();
     }
+
 }
