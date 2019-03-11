@@ -1,6 +1,6 @@
 // This is a Software Engineering Group Project
 // Contributor: DaiLu, WangHaoyu, ZhangJingtun
-// Last modified: 20190310 10:22
+// Last modified: 20190311 17:01
 #include "specifiedHeadOrTail.h"
 #include "specifiedWordNumbers.h"
 #include "defaultCase.h"
