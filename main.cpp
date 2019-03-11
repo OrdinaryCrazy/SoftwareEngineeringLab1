@@ -14,14 +14,16 @@
 #include <cstring>
 #include <string>
 void usage(){
-    std::string usage="Usage: Wordlist [options] <filename>\r\nOptions:\r\n\
+    std::string usage="Usage: Wordlist [arguments] <filename>\r\n\
+Mandatory arguments:\r\n\
     -c: Output one word list with the most characters. \r\n\
-    -w: Output one word list with the most words.\r\n\
-    (Note: -c or -w must be used as the last option argument)\r\n\r\n\
+    -w: Output one word list with the most words.\r\n\r\n\
+Optional arguments:\r\n\
     -h <char>: Determine the head character of the word list.\r\n\
     -t <char>: Determine the tail character of the word list.\r\n\
     (Note: -h and -t can be used at the same time)\r\n\
-    -n <num>: Output all word lists containing <num> words.\r\n";
+    -n <num>: Output all word lists containing <num> words.\r\n\
+    (Note: -n must be used with -w)";
     cout<<usage;
     exit(1);
 }
@@ -35,70 +37,80 @@ int main (int argc, char*argv[]){
     bool fixedWordNum = false;
     bool fixedHead = false;
     bool fixedTail = false;
-    bool getInputFile = false;
+//    bool getInputFile = false;
     int wordNum;
     std::string inputFile;
     char head,tail;
-
-    for(int i = 0;i < argc;i++){
-        switch (argv[i][0]){
-            case '-':
-                switch (argv[i][1]){
-                    case 'w':
-                        mostWord = true;
-                        getInputFile = true;
-                        if (i+1<argc){
-                            inputFile = std::string(argv[i + 1]);
-                        }   
-                        else {
-                            std::cout<<"Please give input file name."<<std::endl;
-                            usage();
-                        }
-                        break;
-                    case 'c':
-                        mostChar = true;
-                        getInputFile = true;
-                        if (i+1<argc){
-                            inputFile = std::string(argv[i + 1]);
-                        }
-                        else{
-                            std::cout<<"Please give input file name."<<std::endl;
-                            usage();
-                        }                        
-                        break;
-                    case 'h':
-                        fixedHead = true;
+    if (argc<=2){
+        std::cout<<"Too few arguments."<<std::endl;
+        usage();
+    }
+    inputFile = std::string(argv[argc-1]);
+    for(int i=1;i<argc-1;i++){
+        if (strlen(argv[i])==2 && argv[i][0]=='-'){
+            switch (argv[i][1]){
+                case 'w':
+                    mostWord = true;
+                    break;
+                case 'c':
+                    mostChar = true;                   
+                    break;
+                case 'h':
+                    fixedHead = true;
+                    if (i+1<argc-1 && strlen(argv[i+1])==1){
                         head = argv[i + 1][0];
-                        break;
-                    case 't':
-                        fixedTail = true;
-                        tail = argv[i + 1][0];
-                        break;
-                    case 'n':
-                        fixedWordNum = true;
-                        if (i+1<argc){
-                            wordNum = stoi(std::string(argv[i + 1]));
-                        }
-                        else{
-                            std::cout<<"Please give the number of words."<<std::endl;
-                            usage();
-                        }                              
-                        break;
-                    default:
-                        std::cout<< "invalid option." <<std::endl;
+                        i++;
+                    }
+                    else{
+                        std::cout<<"A character is needed after -h."<<std::endl;
                         usage();
-                        break;
-                }
-                break;
-        
-            default:
-                break;
+                    }                   
+                    break;
+                case 't':
+                    fixedTail = true;
+                    if (i+1<argc-1 && strlen(argv[i+1])==1){
+                        tail = argv[i + 1][0];
+                        i++;
+                    }
+                    else{
+                        std::cout<<"A character is needed after -t."<<std::endl;
+                        usage();
+                    }    
+                    break;
+                case 'n':
+                    fixedWordNum = true;
+                    try{
+                        if (i+1<argc-1) throw 0;
+                        wordNum = stoi(std::string(argv[i + 1]));
+                        i++;
+                        if (wordNum<=0) throw 0;
+                    }
+                    catch(...){
+                        std::cout<<"A positive integer is needed after -n."<<std::endl;
+                        usage();
+                    }                                                    
+                    break;
+                default:
+                    std::cout<< "Invalid option." <<std::endl;
+                    usage();
+                    break;
+            }
+        }
+        else{
+            std::cout<< "Invalid argument." <<std::endl;
+            usage();
         }
     }
+    /*
     if(getInputFile == false){
         std::cout<<"Please give input file name."<<std::endl;
         usage();
         exit(0);
+    }
+    */
+    if (mostChar==mostWord || (fixedWordNum && (fixedTail || fixedHead || mostChar)) ){
+        std::cout<< "Wrong argument usage." <<std::endl;
+        usage();
     }
     ifstream inFile(inputFile);
     if(!inFile){
@@ -114,17 +126,9 @@ int main (int argc, char*argv[]){
     }
     std::vector<std::string> crudeData = sHoT::preprocessingData(crudeString);
     if (!fixedHead && !fixedTail && !fixedWordNum){
-        if (mostChar){
-            def::makeGraph(crudeData,1);
-            def::search();
-        }
-        else if (mostWord){
-            def::makeGraph(crudeData,0);
-            def::search();
-        }
-        else {
-            usage();
-        }
+        if (mostChar)   def::makeGraph(crudeData,1);
+        else    def::makeGraph(crudeData,0);
+        def::search();
     }
     if(fixedHead && !fixedTail && head <= 'z' && head >= 'a'){
         if(mostWord || (mostChar == false && mostWord == false)){
