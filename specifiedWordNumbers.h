@@ -38,11 +38,12 @@ void request4(vector<string> w, int n){
                 }
         }
     }
-    cout<<b.size();
+    std::ofstream solutionOut("./solution.txt");
+    solutionOut<<b.size();
     for(vector<string> v:b){
-        cout<<endl;
+        solutionOut<<endl;
         for(string s:v)
-            cout<<s<<endl;
+            solutionOut<<s<<endl;
     }
     
 }

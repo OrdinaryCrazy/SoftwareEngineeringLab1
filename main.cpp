@@ -3,7 +3,7 @@
 // Last modified: 20190310 10:22
 #include "specifiedHeadOrTail.h"
 #include "specifiedWordNumbers.h"
-#include "wang.h"
+#include "defaultCase.h"
 #include <iostream>
 #include <algorithm>
 #include <vector> 
@@ -13,10 +13,21 @@
 #include <string.h>
 #include <cstring>
 #include <string>
-
+void usage(){
+    std::string usage="Usage: Wordlist [options] <filename>\r\nOptions:\r\n\
+    -c: Output one word list with the most characters. \r\n\
+    -w: Output one word list with the most words.\r\n\
+    (Note: -c or -w must be used as the last option argument)\r\n\r\n\
+    -h <char>: Determine the head character of the word list.\r\n\
+    -t <char>: Determine the tail character of the word list.\r\n\
+    (Note: -h and -t can be used at the same time)\r\n\
+    -n <num>: Output all word lists containing <num> words.\r\n";
+    cout<<usage;
+    exit(1);
+}
 int main (int argc, char*argv[]){
     using namespace sHoT;
-    using namespace wang;
+    using namespace def;
     using namespace std;
 
     bool mostChar = false;
@@ -36,12 +47,24 @@ int main (int argc, char*argv[]){
                     case 'w':
                         mostWord = true;
                         getInputFile = true;
-                        inputFile = std::string(argv[i + 1]);
+                        if (i+1<argc){
+                            inputFile = std::string(argv[i + 1]);
+                        }   
+                        else {
+                            std::cout<<"Please give input file name."<<std::endl;
+                            usage();
+                        }
                         break;
                     case 'c':
                         mostChar = true;
                         getInputFile = true;
-                        inputFile = std::string(argv[i + 1]);
+                        if (i+1<argc){
+                            inputFile = std::string(argv[i + 1]);
+                        }
+                        else{
+                            std::cout<<"Please give input file name."<<std::endl;
+                            usage();
+                        }                        
                         break;
                     case 'h':
                         fixedHead = true;
@@ -53,10 +76,17 @@ int main (int argc, char*argv[]){
                         break;
                     case 'n':
                         fixedWordNum = true;
-                        wordNum = stoi(std::string(argv[i + 1]));
+                        if (i+1<argc){
+                            wordNum = stoi(std::string(argv[i + 1]));
+                        }
+                        else{
+                            std::cout<<"Please give the number of words."<<std::endl;
+                            usage();
+                        }                              
                         break;
                     default:
                         std::cout<< "invalid option." <<std::endl;
+                        usage();
                         break;
                 }
                 break;
@@ -67,6 +97,7 @@ int main (int argc, char*argv[]){
     }
     if(getInputFile == false){
         std::cout<<"Please give input file name."<<std::endl;
+        usage();
         exit(0);
     }
     ifstream inFile(inputFile);
@@ -82,7 +113,19 @@ int main (int argc, char*argv[]){
         crudeString.append(" ");
     }
     std::vector<std::string> crudeData = sHoT::preprocessingData(crudeString);
-
+    if (!fixedHead && !fixedTail && !fixedWordNum){
+        if (mostChar){
+            def::makeGraph(crudeData,1);
+            def::search();
+        }
+        else if (mostWord){
+            def::makeGraph(crudeData,0);
+            def::search();
+        }
+        else {
+            usage();
+        }
+    }
     if(fixedHead && !fixedTail && head <= 'z' && head >= 'a'){
         if(mostWord || (mostChar == false && mostWord == false)){
             sHoT::findPathWithSpecifiedHead(sHoT::buildGraph(crudeData,true,true),head);

@@ -54,8 +54,8 @@ int currentWeight,longestWeight;
 DFS可以得到从一个图节点（字母）出发导出的所有单词链。由于没有指定开头的字母，应当对所有的节点进行深度优先搜索，输出最长的单词链。  
 在具体使用中，可以使用如下的代码：
 ```C++
-wang::makeGraph(s,0);
-wang::search();
+def::makeGraph(s,0);
+def::search();
 ```
 其中s是一个字符串向量std::vector < std::string >,而且每一个单词都应当全部由小写字母组成。最后的结果会输出到与可执行文件同目录的solution.txt文件中。
 
@@ -63,8 +63,8 @@ wang::search();
 在实现上与单词数量最多的单词链基本没有不同，只是把节点权重设置为单词长度而不是1。
 在具体使用中，可以使用如下的代码：
 ```C++
-wang::makeGraph(s,1);
-wang::search();
+def::makeGraph(s,1);
+def::search();
 ```
 输入输出要求同上。
 

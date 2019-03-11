@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-namespace wang{
+namespace def{
 struct node{
     int weight;
     bool used;
