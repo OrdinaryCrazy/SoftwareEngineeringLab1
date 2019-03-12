@@ -1,4 +1,0 @@
-algebra
-aib
-bond
-dog

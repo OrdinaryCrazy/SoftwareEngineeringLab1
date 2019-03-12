@@ -23,7 +23,7 @@ Optional arguments:\r\n\
     -t <char>: Determine the tail character of the word list.\r\n\
     (Note: -h and -t can be used at the same time)\r\n\
     -n <num>: Output all word lists containing <num> words.\r\n\
-    (Note: -n must be used with -w)";
+    (Note: -n must be used with -w)\r\n";
     cout<<usage;
     exit(0);
 }

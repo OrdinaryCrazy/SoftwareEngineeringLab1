@@ -159,6 +159,18 @@ namespace sHoT{
             wordList.push_back(std::string(tokenPtr));
             tokenPtr = strtok(NULL," ");
         }
+        sort(wordList.begin(),wordList.end());
+        /*
+        for(int i = 0;i < wordList.size();i++)
+            std::cout<<wordList[i]<<std::endl;
+        std::cout<<std::endl;
+        */
+        std::vector<std::string>::iterator iter = unique(wordList.begin(),wordList.end());
+        wordList.erase(iter,wordList.end());
+        /*
+        for(int i = 0;i < wordList.size();i++)
+            std::cout<<wordList[i]<<std::endl;
+        */
         return wordList;
     }
 }
