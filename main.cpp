@@ -25,7 +25,7 @@ Optional arguments:\r\n\
     -n <num>: Output all word lists containing <num> words.\r\n\
     (Note: -n must be used with -w)";
     cout<<usage;
-    exit(1);
+    exit(0);
 }
 int main (int argc, char*argv[]){
     using namespace sHoT;
@@ -59,6 +59,13 @@ int main (int argc, char*argv[]){
                     fixedHead = true;
                     if (i+1<argc-1 && strlen(argv[i+1])==1){
                         head = argv[i + 1][0];
+                        if ('A'<=head && head<='Z'){
+                            head=head+32;
+                        }
+                        if (head<'a' || head>'z'){
+                            std::cout<<"A character is needed after -h."<<std::endl;
+                            usage();
+                        }
                         i++;
                     }
                     else{
@@ -70,6 +77,13 @@ int main (int argc, char*argv[]){
                     fixedTail = true;
                     if (i+1<argc-1 && strlen(argv[i+1])==1){
                         tail = argv[i + 1][0];
+                        if ('A'<=tail && tail<='Z'){
+                            tail=tail+32;
+                        }
+                        if (tail<'a' || tail>'z'){
+                            std::cout<<"A character is needed after -t."<<std::endl;
+                            usage();
+                        }
                         i++;
                     }
                     else{
@@ -80,7 +94,7 @@ int main (int argc, char*argv[]){
                 case 'n':
                     fixedWordNum = true;
                     try{
-                        if (i+1<argc-1) throw 0;
+                        if (i+1>=argc-1) throw 0;
                         wordNum = stoi(std::string(argv[i + 1]));
                         i++;
                         if (wordNum<=0) throw 0;

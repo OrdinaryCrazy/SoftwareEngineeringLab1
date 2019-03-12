@@ -18,6 +18,7 @@ mn
 no
 op
 pq
+qr
 rs
 st
 tu
