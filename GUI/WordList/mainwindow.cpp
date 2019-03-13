@@ -13,7 +13,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    // connect(ui->convertButton,SIGNAL(clicked()),this,SLOT(convertButton()));
 }
 
 MainWindow::~MainWindow()
@@ -23,7 +22,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_convertButton_clicked()
 {
-    // accept();
     QProcess* wordListCaller = new QProcess(this);
     bool everythingOK = true;
     QTextDocument* input = ui->InputText->document();
@@ -36,8 +34,7 @@ void MainWindow::on_convertButton_clicked()
     }
 
     QStringList arguments = QStringList();
-    //arguments<<"../../Wordlist";
-    //这里需要一个约束
+    // 检查选项设置的合法性
     if(ui->mostCharCheck->isChecked() == ui->mostWordCheck->isChecked() || \
             (ui->fixNumCheck->isChecked() && \
             (ui->fixHeadCheck->isChecked() || ui->fixTailCheck->isChecked() || ui->mostCharCheck->isChecked())))
@@ -50,7 +47,7 @@ void MainWindow::on_convertButton_clicked()
         label->show();
         everythingOK = false;
     }
-    //
+    // 依次设置命令行参数
     if(ui->mostWordCheck->isChecked()){
         arguments<<"-w";
     }
@@ -61,7 +58,7 @@ void MainWindow::on_convertButton_clicked()
     if(ui->fixHeadCheck->isChecked()){
         QString headline = ui->fixHead->text();
         //std::string headLineStd = headline.toStdString();
-        if(headline[0] <= 'a' || headline[0] >= 'z' || headline.length() < 1){
+        if(headline[0] < 'a' || headline[0] > 'z' || headline.length() < 1){
             QLabel* label = new QLabel();
             label->setWindowTitle("Wrong argument usage.");
             label->setText("<h2><font color=red>非法开头字母设置（必填 && 只接受小写英文字母）</font></h2>");
@@ -73,8 +70,7 @@ void MainWindow::on_convertButton_clicked()
     }
     if(ui->fixTailCheck->isChecked()){
         QString tailline = ui->fixTail->text();
-        //std::string headLineStd = headline.toStdString();
-        if(tailline[0] <= 'a' || tailline[0] >= 'z' || tailline.length() < 1){
+        if(tailline[0] < 'a' || tailline[0] > 'z' || tailline.length() < 1){
             QLabel* label = new QLabel();
             label->setWindowTitle("Wrong argument usage.");
             label->setText("<h2><font color=red>非法结尾字母设置（必填 && 只接受小写英文字母）</font></h2>");
@@ -89,13 +85,15 @@ void MainWindow::on_convertButton_clicked()
         arguments<<QString((char)(ui->fixNumber->value() + 48));
     }
     arguments<<"./tempInputFile.txt";
+    //满足条件后调用命令行程序
     if(everythingOK){
         wordListCaller->start("./WordlistCUI",arguments);
         wordListCaller->waitForFinished();
-
+        // 删除可能的临时文件
         QStringList cleanarguments = QStringList();
         cleanarguments<<"./tempInputFile.txt";
         wordListCaller->start("rm",cleanarguments);
+        // 将结果读取到输出区
         QFile resultFile("./solution.txt");
         resultFile.open(QIODevice::ReadOnly);
         ui->outputText->setText(resultFile.readAll());
@@ -108,8 +106,6 @@ void MainWindow::on_loadFromFile_clicked()
     QFile inputFile(inputFileName);
     inputFile.open(QIODevice::ReadOnly);
     ui->InputText->setPlainText(inputFile.readAll());
-    // qDebug() <<inputFileName;
-
 }
 
 void MainWindow::on_saveOutputFile_clicked()

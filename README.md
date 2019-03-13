@@ -26,6 +26,27 @@ This is a group project repository.
 
 ## 入口主函数
 
+* 功能控制开关说明：
+
+```C++
+bool mostChar = false; 				//最多字母模式开关
+bool mostWord = false;				//最多单词模式开关
+bool fixedWordNum = false;		//确定单词数量模式开关
+bool fixedHead = false;					//确定开头字母模式开关
+bool fixedTail = false;						//确定结尾字母模式开关
+```
+
+* 主要变量说明：
+
+```c++
+int wordNum;					//确定单词数量模式对应的单词数量
+std::string inputFile;		//数据文件名
+char head,tail;					//确定的开头字母和结尾字母
+std::string crudeString;	//从输入文件读取的原始内容
+std::vector<std::string> crudeData = sHoT::preprocessingData(crudeString);
+//通过数据预处理得到的字符串向量，作为各功能部件的数据接口输入
+```
+
 ## 单词数量最多的单词链
 构建有向图，以单词为边，以字母为节点，采用邻接链表形式存储。链表节点结构如下:
 ```C++
@@ -68,11 +89,251 @@ def::search();
 ```
 输入输出要求同上。
 
-## 指定开头或结尾的字母的单词链
+## 指定开头或结尾的字母的单词链（`specifiedHeadOrTail.h`）
 
+* 图数据结构及`sHoT`命名空间全局变量含义说明
+
+```c++
+// graph datastructure
+    struct edge{
+        std::string* data;  //边对应的单词
+        int weight;         //边的权重，根据模式的不同分别设置为1或单词的长度
+        char destChar;      //有向边的目的节点
+        char originChar;    //有向边的源节点
+        bool used;          //使用标志位，避免重复搜索
+        struct edge* next;
+    };
+    typedef struct edge edge;
+    struct node{
+        char ch;            //节点对应的字母
+        edge* adjEdges;     //邻接链表
+    };
+    typedef struct node node;
+
+    // global variable
+    std::vector<std::string> searchingPath; //当前搜索路径（单词链）
+    int searchingWeight;                    //当前搜索路径的权重（长度）
+    std::vector<std::string> resultPath;    //当前搜索过的最长路径（单词链）
+    int resultWeight;                       //当前搜索过的最长路径的权重（长
+```
+
+* 建图函数说明
+
+  ```c++
+  // build graph from crude string data
+      node* buildGraph(std::vector<std::string> crudeData,bool mostWord = true,bool headOrder = true){
+          /*  参数说明：
+                  1、std::vector<std::string> crudeData 输入字符向量
+                  2、mostWord 是否开启最多单词模式（默认为最多单词模式）
+                  3、headOrder 是否以首字母为源节点（固定开头字母时使用，默认固定开头字母模式）
+              输出：
+                  以26个英文字母对应的节点数组表示的图
+          */
+          //节点数组
+          node* graph = new node[26];
+          for(int i = 0;i < 26;i++){
+              graph[i].ch = 97 + i;
+              graph[i].adjEdges = NULL;
+          }
+          //读取数据连接对应的边
+          for(int i = 0;i < crudeData.size();i++){
+              edge* inputEdge = new edge;
+              inputEdge->data = new std::string(crudeData[i]);
+              inputEdge->next = NULL;
+              inputEdge->used = false;
+              inputEdge->destChar = crudeData[i][crudeData[i].length() - 1];
+              inputEdge->originChar = crudeData[i][0];
+              if(mostWord){
+                  inputEdge->weight = 1;
+              }
+              else{
+                  inputEdge->weight = crudeData[i].length();
+              }
+              int insertNode;
+              if(headOrder){
+                  insertNode = crudeData[i][0] - 97;
+              }
+              else{
+                  insertNode = crudeData[i][crudeData[i].length() - 1] - 97;
+              }
+              inputEdge->next = graph[insertNode].adjEdges;
+              graph[insertNode].adjEdges = inputEdge;
+          }
+          searchingWeight = resultWeight = 0;
+  
+          return graph;
+      }
+  ```
+
+  
+
+* 固定开头字母搜索
+
+```c++
+// 固定开头字母模式
+    void findPathWithSpecifiedHead(node* graph,char head){
+        /*  参数说明：
+                1、node* graph 要搜索的图
+                2、char head 当前搜索节点
+            输出：无输出，将最长路径保存在 resultPath 中
+        */
+        edge* fromEdge = graph[head - 'a'].adjEdges;
+        while(fromEdge != NULL){
+            if(fromEdge->used == false){
+
+                fromEdge->used = true;
+                searchingPath.push_back(*(fromEdge->data));
+                searchingWeight += fromEdge->weight;
+                //DFS递归搜索
+                findPathWithSpecifiedHead(graph,fromEdge->destChar);
+                
+                searchingWeight -= fromEdge->weight;
+                fromEdge->used = false;
+                searchingPath.pop_back();
+            }
+            fromEdge = fromEdge->next;
+        }
+        //每条路径搜索结束后与当前搜索到的最长路径比较，如果更长则更新最长路径及最长路径权重
+        if(searchingWeight > resultWeight){
+            resultWeight = searchingWeight;
+            resultPath.assign(searchingPath.begin(),searchingPath.end());
+            //resultPath.reserve(resultPath.size());
+        }
+    }
+```
+
+
+
+* 固定结尾字母搜索（与固定开头字母搜索没有太大区别，因为对应图结构已按照要求调整，只需要将最后结果反转即可）
+```c++
+// 固定结尾字母模式
+    void findPathWithSpecifiedTail(node* graph,char tail){
+        /*  参数说明：
+                1、node* graph 要搜索的图
+                2、char tail 当前搜索节点
+            输出：无输出，将最长路径保存在 resultPath 中
+        */
+        edge* fromEdge = graph[tail - 'a'].adjEdges;
+        while(fromEdge != NULL){
+            if(fromEdge->used == false){
+
+                fromEdge->used = true;
+                searchingPath.push_back(*(fromEdge->data));
+                searchingWeight += fromEdge->weight;
+
+                findPathWithSpecifiedTail(graph,fromEdge->originChar);
+                
+                searchingWeight -= fromEdge->weight;
+                fromEdge->used = false;
+                searchingPath.pop_back();
+            }
+            fromEdge = fromEdge->next;
+        }
+        if(searchingWeight > resultWeight){
+            resultWeight = searchingWeight;
+            resultPath.assign(searchingPath.begin(),searchingPath.end());
+            reverse(resultPath.begin(),resultPath.end());
+        }
+    }
+```
+
+* 同时固定开头和结尾字母搜索
+
+```c++
+//固定开头字母和结尾字母模式
+    void findPathWithSpecifiedHeadAndTail(node* graph,char head,char tail){
+        /*  参数说明：
+                1、node* graph 要搜索的图
+                2、char tail 最终目标结尾节点
+                3、char head 当前搜索节点
+            输出：无输出，将最长路径保存在 resultPath 中
+        */
+        //并不是在每条路径末尾与最长路径比较，而是当发现到达目标节点时更新最长路径
+        if(head == tail && searchingWeight > resultWeight){
+            resultWeight = searchingWeight;
+            resultPath.assign(searchingPath.begin(),searchingPath.end());
+        }
+        edge* fromEdge = graph[head - 'a'].adjEdges;
+        while(fromEdge != NULL){
+            if(fromEdge->used == false){
+
+                fromEdge->used = true;
+                searchingPath.push_back(*(fromEdge->data));
+                searchingWeight += fromEdge->weight;
+
+                findPathWithSpecifiedHeadAndTail(graph,fromEdge->destChar,tail);
+                
+                searchingWeight -= fromEdge->weight;
+                fromEdge->used = false;
+                searchingPath.pop_back();
+            }
+            fromEdge = fromEdge->next;
+        }
+    }
+```
 ## 指定单词链个数的单词链
 
+
 ## GUI
+
+###  开发环境：
+
+  > 操作系统：Ubuntu 18.10
+  >
+  > 编译环境：g++ (Ubuntu 8.2.0-7ubuntu1) 8.2.0
+  >
+  > 图形库：Qt 5.12.0 GCC64bit
+  >
+  > 设计工具：Qt Creator 4.8.0
+  >
+  > 依赖库说明：将上述命令行程序作为依赖库添加在图形化程序目录下，重命名为`WordlistCUI`
+
+### 界面说明及控件对应关系：
+
+![](./GUI.png)
+
+* 输入区：`QPlainTextEdit InputText`
+* 输出区：`QTextBrowser outputText`
+* 最多单词数量：`QRadioButton mostWordCheck`
+* 最多字母数量：`QRadioButton mostCharCheck`
+* 固定开头：`QCheckBox fixHeadCheck`
+* 固定开头输入：`QLineEdit fixHead`
+* 固定结尾：`QCheckBox fixTailCheck`
+* 固定结尾输入：`QLineEdit fixTail`
+* 固定单词数量：`QCheckBox fixNumCheck`
+* 固定单词数量选择：`QSpinBox fixNumber`
+* 搜索单词链：`QPushButton convertButton `
+* 从文件加载输入：`QPushButton loadFromFile `
+* 将结果导出到文件：`QPushButton saveOutputFile `
+
+### 槽函数处理：
+
+<h4><font color=red><B>注 ：（这里使用了Qt自动关联，on_xxx_clicked() 槽函数自动关联到xxx部件信号）</B></font></h4>
+
+* 处理搜索命令信号：`void MainWindow::on_convertButton_clicked()`
+
+> 创建`QProcess`实例准备调用命令行程序 ---> 
+>
+> 将输入区文本保存为临时文件`tempInputFile.txt` --->
+>
+> 检查各参数对应的部件信号，处理不合法信号组合并给出提示，根据相应的信号设置命令行参数--->
+>
+> 调用命令行程序--->
+>
+> 将结果从文件读出并打印在输出文本区
+
+* 处理从文件加载输入信号：`void MainWindow::on_loadFromFile_clicked()`
+
+> `QFileDialog::getOpenFileName()`函数获取选择的文件名---> 
+>
+> 读取相应的文件并将内容打印在输入区
+
+* 处理将结果输出到文件信号：`void MainWindow::on_saveOutputFile_clicked()`
+
+> `QFileDialog::getSaveFileName`函数获取选择的文件名---> 
+>
+> 直接将命令行程序运行结果重命名或复制到制定路径和文件名
+
 ## 测试样例说明
 + test1.txt是题目中给出的测试样例
 + test2.txt主要测试预处理能力，是否可以正确地分割输入字符得到单词，以及对于字母大小写的处理是否正确

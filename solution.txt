@@ -1,7 +1,4 @@
-add
-dcfaswc
-cd
-daa
-ab
-biufd
-d
+algebra
+apple
+elephant
+trick

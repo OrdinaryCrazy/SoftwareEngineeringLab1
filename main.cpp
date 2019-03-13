@@ -32,15 +32,15 @@ int main (int argc, char*argv[]){
     using namespace def;
     using namespace std;
 
-    bool mostChar = false;
-    bool mostWord = false;
-    bool fixedWordNum = false;
-    bool fixedHead = false;
-    bool fixedTail = false;
-//    bool getInputFile = false;
-    int wordNum;
-    std::string inputFile;
-    char head,tail;
+    bool mostChar = false;      //最多字母模式开关
+    bool mostWord = false;      //最多单词模式开关
+    bool fixedWordNum = false;  //确定单词数量模式开关
+    bool fixedHead = false;     //确定开头字母模式开关
+    bool fixedTail = false;     //确定结尾字母模式开关
+    int wordNum;                //确定单词数量模式对应的单词数量
+    std::string inputFile;      //数据文件名
+    char head,tail;             //确定的开头字母和结尾字母
+
     if (argc<=2){
         std::cout<<"Too few arguments."<<std::endl;
         usage();
@@ -115,13 +115,7 @@ int main (int argc, char*argv[]){
             usage();
         }
     }
-    /*
-    if(getInputFile == false){
-        std::cout<<"Please give input file name."<<std::endl;
-        usage();
-        exit(0);
-    }
-    */
+    
     if (mostChar==mostWord || (fixedWordNum && (fixedTail || fixedHead || mostChar)) ){
         std::cout<< "Wrong argument usage." <<std::endl;
         usage();
@@ -131,13 +125,14 @@ int main (int argc, char*argv[]){
         std::cout<<"Can not open data file."<<std::endl;
         exit(0);
     }
-    std::string crudeString;
+    std::string crudeString;    //从输入文件读取的原始内容
     std::string tempString;
     while(!inFile.eof()){
         inFile>>tempString;
         crudeString.append(tempString);
         crudeString.append(" ");
     }
+    //通过数据预处理得到的字符串向量，作为各功能部件的数据接口输入
     std::vector<std::string> crudeData = sHoT::preprocessingData(crudeString);
     if (!fixedHead && !fixedTail && !fixedWordNum){
         if (mostChar)   def::makeGraph(crudeData,1);
