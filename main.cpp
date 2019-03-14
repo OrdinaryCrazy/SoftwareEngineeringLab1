@@ -95,6 +95,10 @@ int main (int argc, char*argv[]){
                     fixedWordNum = true;
                     try{
                         if (i+1>=argc-1) throw 0;
+                        int n=strlen(argv[i+1]);
+                        for (int j=0;j<n;j++){
+                            if (argv[i+1][j]<'0' || argv[i+1][j]>'9')   throw 0;
+                        }
                         wordNum = stoi(std::string(argv[i + 1]));
                         i++;
                         if (wordNum<=0) throw 0;
