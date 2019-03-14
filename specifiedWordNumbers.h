@@ -2,11 +2,9 @@
 #include<string>
 #include<vector>
 #include<unordered_map>
+#include<fstream>
 #include<set>
 using namespace std;
-//大小写不敏感！
-//异常处理
-//边界条件
 namespace sWN{
 
 bool used(string next, vector<string> v){
@@ -15,8 +13,11 @@ bool used(string next, vector<string> v){
     return false;
 }
 void request4(vector<string> w, int n){
+    if(n<2){
+        cout<<"error: as defined, word list must have a length at least 2"<<endl;
+        return;
+    }
     int size = w.size();
-    //注意n>size的情况
     unordered_map<string, vector<string>> adj;
     set<vector<string>> a, b;
     for(string w1:w){
