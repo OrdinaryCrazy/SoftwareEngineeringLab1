@@ -80,10 +80,15 @@ void search(){
         }
     }
     // 对所有的节点进行深度优先搜索
-    std::ofstream mycout("solution.txt");
-    for (int i=0;i<longestList.size();i++){
-        mycout<<longestList[i]<<std::endl;
+    if (longestList.size()<2){
+        cout<<"No wordlist.\r\n";
     }
+    else{
+        std::ofstream mycout("solution.txt");
+        for (int i=0;i<longestList.size();i++){
+            mycout<<longestList[i]<<std::endl;
+        }
+    }   
     // 输出最长的单词链
 }
 }
