@@ -19,6 +19,7 @@ public slots:
     void on_convertButton_clicked();
     void on_loadFromFile_clicked();
     void on_saveOutputFile_clicked();
+    void Result(int a);
 
 private:
     Ui::MainWindow *ui;

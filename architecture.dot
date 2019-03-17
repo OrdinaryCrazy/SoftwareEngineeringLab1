@@ -1,0 +1,56 @@
+digraph architecture{
+    User[shape=re,label="              用户              ",color=pink,style=filled]
+    User->GUI[style=bold,label="操作                 "]
+    GUI->User[style=bold,label="反馈"]
+    GUI[shape=re,label="GUI\n                      检查参数设置                报错                管理临时文件                      ",color=red,style=filled];
+    subgraph cluster_CUI{
+        style=filled;
+        node [style=re];
+        label="CUI";
+        color=green;
+        subgraph cluster_main{
+            style=filled;
+            node [style=re];
+            label="main";
+            color=yellow;
+            parecheck[shape = rectangle,label="参数检查与处理"]
+            parecheck->prepro[style=bold,]
+            prepro[shape = rectangle,label="数据预处理"]
+            prepro->log[style=bold,]
+            log[shape = rectangle,label="逻辑控制"]
+        }
+        log->makeGraph[label="最多单词或最多字母",style=bold]
+        log->buildGraph[label="固定开头或结尾字母",style=bold]
+        log->request4[style=bold,label="固定单词数量"]
+        subgraph cluster_defaultcase{
+            style=filled;
+            node [style=rectangle];
+            label="defaultcase";
+            color=yellow;
+            makeGraph[shape=rectangle]
+            makeGraph->search[style=bold,]
+            search[shape=rectangle]
+        }
+        subgraph cluster_specifiedHeadOrTail{
+            style=filled;
+            node [style=rectangle];
+            label="specifiedHeadOrTail";
+            color=yellow;
+            buildGraph[shape=rectangle]
+            buildGraph->findPathWithSpecifiedHead[style=bold,label="固定开头字母"]
+            buildGraph->findPathWithSpecifiedTail[style=bold,label="固定结尾字母"]
+            buildGraph->findPathWithSpecifiedHeadAndTail[style=bold,label="固定开头和结尾字母"]
+            findPathWithSpecifiedHead[shape=rectangle]
+            findPathWithSpecifiedTail[shape=rectangle]
+            findPathWithSpecifiedHeadAndTail[shape=rectangle]
+        }
+        subgraph cluster_specifiedWordNumbers{
+            style=filled;
+            node [style=rectangle];
+            label="specifiedWordNumbers";
+            color=yellow;
+            request4[shape=rectangle]
+        }
+    }
+    GUI -> parecheck[style=bold,]
+}

@@ -160,6 +160,10 @@ namespace sHoT{
         }
     }
     void printSolution(){
+        if(resultPath.size() < 2){
+            std::cout<<"Sorry for no finding of Wordlist."<<std::endl;
+            exit(1);
+        }
         std::ofstream solutionOut("./solution.txt");
         for(int i = 0;i < resultPath.size();i++){
             solutionOut<<resultPath[i]<<std::endl;

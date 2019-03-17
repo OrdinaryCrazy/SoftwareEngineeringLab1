@@ -89,14 +89,44 @@ void MainWindow::on_convertButton_clicked()
     if(everythingOK){
         wordListCaller->start("./WordlistCUI",arguments);
         wordListCaller->waitForFinished();
-        // 删除可能的临时文件
-        QStringList cleanarguments = QStringList();
-        cleanarguments<<"./tempInputFile.txt";
-        wordListCaller->start("rm",cleanarguments);
+
         // 将结果读取到输出区
+        connect(wordListCaller,SIGNAL(finished(int)),this,SLOT(Result(int)));
         QFile resultFile("./solution.txt");
-        resultFile.open(QIODevice::ReadOnly);
-        ui->outputText->setText(resultFile.readAll());
+        if(resultFile.open(QIODevice::ReadOnly)){
+            ui->outputText->setText(resultFile.readAll());
+        }
+        else{
+            ui->outputText->clear();
+        }
+
+        QStringList saveArguments = QStringList();
+        saveArguments<<"./solution.txt";
+        wordListCaller->start("rm",saveArguments);
+        wordListCaller->waitForFinished();
+        wordListCaller->close();
+    }
+    else {
+        ui->outputText->clear();
+    }
+    // 删除可能的临时文件
+    QStringList cleanarguments = QStringList();
+    cleanarguments<<"./tempInputFile.txt";
+    wordListCaller->start("rm",cleanarguments);
+    wordListCaller->waitForFinished();
+}
+void MainWindow::Result(int a)
+{
+    //std::cout<<a<<std::endl;
+    if (1 == a)
+    {
+        QLabel* label = new QLabel();
+        label->setWindowTitle("No Word List Found.");
+        label->setText("<h2><font color=red>也许这不是一个错误，但是我确实没有找到符合要求的单词链。</font></h2>");
+        label->show();
+    }
+    else {
+        ;
     }
 }
 
@@ -104,16 +134,41 @@ void MainWindow::on_loadFromFile_clicked()
 {
     QString inputFileName = QFileDialog::getOpenFileName(this,"选择数据文件","./","文本文件(*txt)");
     QFile inputFile(inputFileName);
-    inputFile.open(QIODevice::ReadOnly);
-    ui->InputText->setPlainText(inputFile.readAll());
+    if(!inputFile.open(QIODevice::ReadOnly)){
+        QLabel* label = new QLabel();
+        label->setWindowTitle("File Open Error.");
+        label->setText("<h2><font color=red>无法打开文件或文件不存在</font></h2>");
+        label->show();
+    }
+    else{
+        ui->InputText->setPlainText(inputFile.readAll());
+    }
 }
 
 void MainWindow::on_saveOutputFile_clicked()
 {
     QString outputFileName = QFileDialog::getSaveFileName(this,"选择保存文件","./","文本文件(*txt)");
-    QProcess* wordListCaller = new QProcess(this);
-    QStringList saveArguments = QStringList();
-    saveArguments<<"./solution.txt";
-    saveArguments<<outputFileName;
-    wordListCaller->start("mv",saveArguments);
+    QFile outputFile(outputFileName);
+    if(outputFile.open(QIODevice::WriteOnly)){
+        QTextStream ts(&outputFile);
+        ts<<ui->outputText->document()->toPlainText();
+    }
+    /**
+    QFileInfo findExist("./lastsolution.txt");
+    if(findExist.exists()){
+        QString outputFileName = QFileDialog::getSaveFileName(this,"选择保存文件","./","文本文件(*txt)");
+        QProcess* wordListCaller = new QProcess(this);
+        QStringList saveArguments = QStringList();
+        saveArguments<<"./lastsolution.txt";
+        saveArguments<<outputFileName;
+        wordListCaller->start("mv",saveArguments);
+        wordListCaller->waitForFinished();
+    }
+    else {
+        QLabel* label = new QLabel();
+        label->setWindowTitle("No Result Error.");
+        label->setText("<h2><font color=red>实际上你还没有作出任何结果。</font></h2>");
+        label->show();
+    }
+    **/
 }

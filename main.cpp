@@ -173,4 +173,5 @@ int main (int argc, char*argv[]){
     if(fixedWordNum){
         sWN::request4(crudeData, wordNum);
     }
+    return 0;
 }
