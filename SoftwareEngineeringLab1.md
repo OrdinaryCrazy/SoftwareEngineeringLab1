@@ -26,6 +26,10 @@
 
 
 
+工程框架为：
+
+![](D:\labs_software_engineering\SoftwareEngineeringLab1\images\architecture.png)
+
 ## 2. 编译环境
 
 * `Windows`下`g++` 编译 得可执行文件
@@ -93,6 +97,24 @@
 > `QFileDialog::getSaveFileName`函数获取选择的文件名---> 
 >
 > 直接将命令行程序运行结果重命名或复制到制定路径和文件名
+
+
+
+### GUI工作界面
+
+![](D:\labs_software_engineering\SoftwareEngineeringLab1\images\GUI-debug.jpg)
+
+
+
+![](D:\labs_software_engineering\SoftwareEngineeringLab1\images\GUI-debug2.png)
+
+
+
+![](D:\labs_software_engineering\SoftwareEngineeringLab1\images\GUI-debug3.png)
+
+
+
+![](D:\labs_software_engineering\SoftwareEngineeringLab1\images\GUI-debug4.png)
 
 
 
@@ -388,19 +410,514 @@ for(int i=1; i<n; i++){
 
 | testcase   | 设计目的                                                     |
 | ---------- | ------------------------------------------------------------ |
-| test1.txt  | 题目中需求1给出的测试样例。可测试大小写转化和基本功能        |
-| test2.txt  | 提供了具有干扰字符的文件。测试程序能否分割输入字符得到单词   |
-| test3.txt  | 测试程序是否处理了不同搜索起点的情况，该样例从不同的起点开始得到的搜索结果长度不同 |
-| test4.txt  | 提供了一幅4个顶点的有向完全图，可以测试程序的搜索性能        |
-| test5.txt  | 提供了一幅只有两个节点的图，可以测试程序的搜索是否完全，-n参数输出的路径条数是否正确 |
-| test6.txt  | 提供了一个单条链的图。其中间结果较多，但最终结果只有一个。用于测试动态规划性能 |
-| test7.txt  | 提供了一个环。测试动态规划能否正确找出所有解。               |
-| test8.txt  | 提供了具有重复单词的文件。测试程序如何处理错误输入。         |
-| test9.txt  | 提供了空文件。此为side case，测试程序的鲁棒性。              |
-| test10.txt | 题目中需求4给出的测试样例。                                  |
+| test1.txt  | 基本需求1，2。题目中需求1给出的测试样例。可测试大小写转化和基本功能 |
+| test2.txt  | 鲁棒性需求。提供了具有干扰字符的文件。测试程序能否分割输入字符得到单词 |
+| test3.txt  | 基本需求3。测试程序是否处理了不同搜索起点的情况，该样例从不同的起点开始得到的搜索结果长度不同 |
+| test4.txt  | 基本需求4。大数据集警告：n=7的合法单词链数目为5016480，运行时间约为3分钟。提供了一幅7个顶点的有向完全图，可以测试程序的搜索性能 |
+| test5.txt  | 基本需求4。提供了一幅只有两个节点的图，可以测试程序的搜索是否完全，-n参数输出的路径条数是否正确 |
+| test6.txt  | 基本需求3。用于测试-h/-t分别和-w，-c共同使用时的输出结果是否相同 |
+| test7.txt  | 基本需求4。提供了一个环。测试动态规划能否正确找出所有解。    |
+| test8.txt  | 鲁棒性需求。提供了具有重复单词的文件。测试程序如何处理错误输入。 |
+| test9.txt  | 鲁棒性需求。提供了空文件。此为side case，测试程序的鲁棒性。  |
+| test10.txt | 基本需求4。题目中需求4给出的测试样例。                       |
+
+
 
 ### 测试结果
 
+---
 
+
+
+#### 鲁棒性需求
+
+1. 重复单词：自动去重
+
+   示例：test8
+
+   ```
+   aaa
+   aaa
+   aaa
+   aaa
+   abb
+   bacon
+   ```
+
+   `.\Wordlist_win10.exe -w .\test\test8.txt`
+
+   输出结果：
+
+   ```
+   aaa
+   abb
+   bacon
+   ```
+
+   
+
+2. 空文件：输出文件为空
+
+   示例：test9(空文件)
+
+   `.\Wordlist_win10.exe -w .\test\test9.txt`
+
+   输出结果：
+
+   一个空的solution.txt
+
+3. 干扰字符文件：自动提取符合要求的字符串
+
+   示例：test2
+
+   ```
+   ab bieiojiosjdfc89biufd.
+   cd76677667d8---
+   dcfaswc/add,daa
+   ```
+
+   .\Wordlist_win10.exe -w .\test\test2.txt
+
+   输出结果：
+
+   ```
+   add
+   dcfaswc
+   cd
+   daa
+   ab
+   biufd
+   d
+   ```
+
+   
+
+4. 大小写转化：自动将输入中的大写转化为小写
+
+   示例：test1
+
+   ```
+   Algebra
+   Apple
+   Zoo
+   Elephant
+   Under
+   Fox
+   Dog
+   Moon
+   Leaf
+   Trick
+   Pseudopseudohypoparathyroidism
+   ```
+
+   .\Wordlist_win10.exe -w .\test\test2.txt
+
+   输出结果：
+
+   ```
+   algebra
+   apple
+   elephant
+   trick
+   ```
+
+5. 未规定的参数组合：报错
+
+   ```
+   Wrong argument usage.
+   Usage: Wordlist [arguments] <filename>
+   Mandatory arguments:
+       -c: Output one word list with the most characters.
+       -w: Output one word list with the most words.
+   
+   Optional arguments:
+       -h <char>: Determine the head character of the word list.
+       -t <char>: Determine the tail character of the word list.
+       (Note: -h and -t can be used at the same time)
+       -n <num>: Output all word lists containing <num> words.
+       (Note: -n must be used with -w)
+   ```
+
+
+
+
+6. 输入非法参数
+
+   `.\Wordlist_win10.exe -h 2 -w  .\test\test1.txt`
+
+   报错：
+
+   ```
+   A character is needed after -h.
+   Usage: Wordlist [arguments] <filename>
+   ......
+   ```
+
+   
+
+#### 基本需求1：单词数量最多的单词链
+
+**输入：test1**
+
+```
+Algebra
+Apple
+Zoo
+Elephant
+Under
+Fox
+Dog
+Moon
+Leaf
+Trick
+Pseudopseudohypoparathyroidism
+```
+
+`.\Wordlist.exe -w .\test\test1.txt`
+
+**输出结果：与正确结果相同**
+
+```
+algebra
+apple
+elephant
+trick
+```
+
+
+
+#### 基本需求2：指定开头或结尾的字母的单词链
+
+**输入：test1**
+
+同基本需求1,略去
+
+`.\Wordlist_win10.exe -c .\test\test1.txt`
+
+**输出结果：**
+
+```
+pseudopseudohypoparathyroidism
+moon
+```
+
+
+
+#### 基本需求3：指定开头或结尾的字母的单词链
+
+示例测试：输入test1
+
+以下测试结果均正确
+
+**固定开头为e：**
+
+`.\Wordlist_win10.exe -h e -w  .\test\test1.txt`
+
+```
+elephant
+trick
+```
+
+
+
+**固定结尾为t：**
+
+`.\Wordlist_win10.exe -t t -w  .\test\test1.txt`
+
+```
+algebra
+apple
+elephant
+```
+
+
+
+**固定开头为a和结尾为t**：
+
+`.\Wordlist_win10.exe -h a -t t -w  .\test\test1.txt`
+
+```
+algebra
+apple
+elephant
+```
+
+
+
+**深入测试: **
+
+1. 考虑到-h/-t可以和-c组合的隐含要求
+
+   test6：
+
+   ```
+   abcdefgh hijklmn
+   ab bc cd dn
+   ```
+
+   因此可以区分单词数最多和字母树最多
+
+   
+
+   若输入-h/-t -w, 则寻找固定开头/结尾的单词数最多的单词链
+
+   `.\Wordlist_win10.exe -h a -t n -w  .\test\test6.txt`
+
+   ```
+   ab
+   bc
+   cd
+   dn
+   ```
+
+   若输入-h/-t  c,  则寻找固定开头/结尾的字母数最多的单词链
+
+   `.\Wordlist_win10.exe -h a -t n -c  .\test\test6.txt`
+
+   ```
+   abcdefgh
+   hijklmn
+   ```
+
+   
+
+2. 证明指定的开头字母不同，输出不同。
+
+   分别输出字母a开头和w开头的字符串
+
+   输入：test3.txt
+
+```
+ab bc cd de
+ef fg gh hi
+ij jk kl lm
+mn no op pq
+qr rs st tu
+uv vw wx xy
+yz
+```
+
+`.\Wordlist_win10.exe -h a -w .\test\test3.txt`
+
+输出结果：
+
+```
+ab
+bc
+cd
+de
+ef
+fg
+gh
+hi
+ij
+jk
+kl
+lm
+mn
+no
+op
+pq
+qr
+rs
+st
+tu
+uv
+vw
+wx
+xy
+yz
+```
+`.\Wordlist_win10.exe -h w -w .\test\test3.txt`
+
+输出结果：
+
+```
+wx
+xy
+yz
+```
+
+
+
+#### 基本需求4：指定单词链个数的单词链
+
+示例测试：
+
+test10
+
+输入：
+
+```
+word 
+digital 
+list 
+```
+
+`.\Wordlist.exe -n 2 -w .\test\test10.txt`
+
+输出结果：
+
+```
+2
+digital
+list
+
+word
+digital
+```
+
+
+
+
+
+**由于基本需求4为主要性能考察部分，在此设计以下测试考察其性能：**
+
+* 大数据集：测试算法输出所有结果的时间。5016480个结果约耗时3分钟
+
+  test4：7个节点的有向完全图
+
+```
+  ab ac ad ae af ag ah
+  ba bc bd be bf bg bh
+  ca cb cd ce cf cg ch
+  da db dc de df dg dh
+  ea eb ec ed ef eg eh
+  fa fb fc fd fe fg fh
+  ga gb gc gd ge gf gh
+  ha hb hc hd he hf hg
+```
+
+  `.\Wordlist.exe -n 7 -w .\test\test4.txt`
+
+  输出结果：
+
+  ```
+  5016480
+
+  ab
+  ba
+  ac
+  ca
+  ad
+  da
+  ae
+
+  ......
+  ```
+
+  
+
+* 输出完整性：测试算法是否能输出全部符合要求的单词链
+
+  test5
+
+  输入：
+
+  ```
+  aqb
+  aqqqb
+  aqwb
+  aqqqqb
+  aqwerrttb
+  
+  bwwea
+  bssxxaa
+  baaaaa
+  baaa
+  bxsza
+  ba
+  ```
+
+  `.\Wordlist_win10.exe -n 2 -w .\test\test5.txt`
+
+  ```
+  60
+  aqb
+  ba
+  
+  aqb
+  baaa
+  
+  aqb
+  baaaaa
+  
+  ......
+  ```
+
+  
+
+
+
+
+
+* 输出完整性/正确性：所有单词构成一个环，测试算法是否能输出所有单词链
+
+  test7
+
+  `.\Wordlist_win10.exe -n 25 -w .\test\test7.txt`
+
+  输出结果：
+
+  ```
+  7
+  abc
+  cde
+  efg
+  ghi
+  ijk
+  klm
+  mna
+  
+  cde
+  efg
+  ghi
+  ijk
+  klm
+  mna
+  abc
+  
+  efg
+  ghi
+  ijk
+  klm
+  mna
+  abc
+  cde
+  
+  ghi
+  ijk
+  klm
+  mna
+  abc
+  cde
+  efg
+  
+  ijk
+  klm
+  mna
+  abc
+  cde
+  efg
+  ghi
+  
+  klm
+  mna
+  abc
+  cde
+  efg
+  ghi
+  ijk
+  
+  mna
+  abc
+  cde
+  efg
+  ghi
+  ijk
+  klm
+  ```
+
+  
 
 
