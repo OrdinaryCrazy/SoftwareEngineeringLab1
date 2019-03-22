@@ -1,15 +1,7 @@
-ab
-ac
-ad
+ab ac ad ae af 
+ba bc bd be bf
+ca cb cd ce cf
+da db dc de df
+ea eb ec ed ef
+fa fb fc fd fe
 
-ba
-bc
-bd
-
-ca
-cb
-cd
-
-da
-db
-dc

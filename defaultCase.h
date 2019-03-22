@@ -1,5 +1,7 @@
 #include <iostream>
 #include <fstream>
+#include <sys/time.h>
+#include <signal.h>
 namespace def{
 struct node{
     int weight;
@@ -72,7 +74,27 @@ void DFS(node *curr){
     // 如果当前单词链长于最长的单词链，就进行把当前单词链作为最长单词链
 }
 
-void search(){
+void signalHandler(int m){
+    //超时处理函数：输出DFS当前查找到的最长单词链
+    std::cout<<"Time limits. The word list output may not be the longest one."<<std::endl;
+    std::ofstream mycout("solution.txt");
+    for (int i=0;i<longestList.size();i++){
+        mycout<<longestList[i]<<std::endl;
+    }
+    exit(0);
+}
+
+void initTimer(int sec){
+    //设置定时器，搜索sec秒后停止搜索
+    struct itimerval value;
+    value.it_value.tv_sec=sec;
+    value.it_value.tv_usec=0;
+    value.it_interval=value.it_value;
+    setitimer(ITIMER_REAL,&value,NULL);
+}
+void search(){  
+    signal(SIGALRM, signalHandler);
+    initTimer(15);
     for (int i=0;i<26;i++){
         if (graph[i]->next!=NULL){
             //printf("%c",i+'a');

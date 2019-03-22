@@ -4,6 +4,8 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <sys/time.h>
+#include <signal.h>
 namespace sHoT{
     // graph datastructure
     struct edge{
@@ -69,6 +71,26 @@ namespace sHoT{
         searchingWeight = resultWeight = 0;
 
         return graph;
+    }
+    void printSolution(){
+        std::ofstream solutionOut("solution.txt");
+        for(int i = 0;i < resultPath.size();i++){
+            solutionOut<<resultPath[i]<<std::endl;
+        }
+    }
+    void signalHandler(int m){
+        //超时处理函数：输出DFS当前查找到的最长单词链
+        std::cout<<"Time limits. The word list output may not be the longest one."<<std::endl;
+        printSolution();
+        exit(0);
+    }
+    void initTimer(int sec){
+        //设置定时器，搜索sec秒后停止搜索
+        struct itimerval value;
+        value.it_value.tv_sec=sec;
+        value.it_value.tv_usec=0;
+        value.it_interval=value.it_value;
+        setitimer(ITIMER_REAL,&value,NULL);
     }
     // 固定开头字母模式
     void findPathWithSpecifiedHead(node* graph,char head){
@@ -157,12 +179,6 @@ namespace sHoT{
                 searchingPath.pop_back();
             }
             fromEdge = fromEdge->next;
-        }
-    }
-    void printSolution(){
-        std::ofstream solutionOut("./solution.txt");
-        for(int i = 0;i < resultPath.size();i++){
-            solutionOut<<resultPath[i]<<std::endl;
         }
     }
     std::vector<std::string> preprocessingData(std::string crudeData){

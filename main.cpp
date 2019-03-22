@@ -13,6 +13,8 @@
 #include <string.h>
 #include <cstring>
 #include <string>
+#include <sys/time.h>
+#include <signal.h>
 void usage(){
     std::string usage="Usage: Wordlist [arguments] <filename>\r\n\
 Mandatory arguments:\r\n\
@@ -144,6 +146,8 @@ int main (int argc, char*argv[]){
         def::search();
     }
     if(fixedHead && !fixedTail && head <= 'z' && head >= 'a'){
+        signal(SIGALRM, sHoT::signalHandler);
+        sHoT::initTimer(15);
         if(mostWord || (mostChar == false && mostWord == false)){
             sHoT::findPathWithSpecifiedHead(sHoT::buildGraph(crudeData,true,true),head);
         }
@@ -153,6 +157,8 @@ int main (int argc, char*argv[]){
         sHoT::printSolution();
     }
     if(!fixedHead && fixedTail && tail <= 'z' && tail >= 'a'){
+        signal(SIGALRM, sHoT::signalHandler);
+        sHoT::initTimer(15);
         if(mostWord || (mostChar == false && mostWord == false)){
             sHoT::findPathWithSpecifiedTail(sHoT::buildGraph(crudeData,true,false),tail);
         }
@@ -162,6 +168,8 @@ int main (int argc, char*argv[]){
         sHoT::printSolution();
     }
     if(fixedHead && fixedTail && head <= 'z' && head >= 'a' && tail <= 'z' && tail >= 'a'){
+        signal(SIGALRM, sHoT::signalHandler);
+        sHoT::initTimer(15);
         if(mostWord || (mostChar == false && mostWord == false)){
             sHoT::findPathWithSpecifiedHeadAndTail(sHoT::buildGraph(crudeData,true,true),head,tail);
         }
