@@ -108,19 +108,19 @@
 
 ### GUI工作界面
 
-![](D:\labs_software_engineering\SoftwareEngineeringLab1\images\GUI-debug.jpg)
+![](\images\GUI-debug.jpg)
 
 
 
-![](D:\labs_software_engineering\SoftwareEngineeringLab1\images\GUI-debug2.png)
+![](\images\GUI-debug2.png)
 
 
 
-![](D:\labs_software_engineering\SoftwareEngineeringLab1\images\GUI-debug3.png)
+![](\images\GUI-debug3.png)
 
 
 
-![](D:\labs_software_engineering\SoftwareEngineeringLab1\images\GUI-debug4.png)
+![](\images\GUI-debug4.png)
 
 
 
