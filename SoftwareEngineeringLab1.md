@@ -416,16 +416,16 @@ for(int i=1; i<n; i++){
 
 | testcase   | 设计目的                                                     |
 | ---------- | ------------------------------------------------------------ |
-| test1.txt  | 基本需求1，2。题目中需求1给出的测试样例。可测试大小写转化和基本功能 |
-| test2.txt  | 鲁棒性需求。提供了具有干扰字符的文件。测试程序能否分割输入字符得到单词 |
-| test3.txt  | 基本需求3。测试程序是否处理了不同搜索起点的情况，该样例从不同的起点开始得到的搜索结果长度不同 |
-| test4.txt  | 基本需求4。大数据集警告：n=64的合法单词链数目为5016480，运行时间约为3分钟。提供了一幅64个顶点的有向完全图，可以测试程序的搜索性能 |
-| test5.txt  | 基本需求4。提供了一幅只有两个节点的图，可以测试程序的搜索是否完全，-n参数输出的路径条数是否正确 |
-| test6.txt  | 基本需求3。用于测试-h/-t分别和-w，-c共同使用时的输出结果是否相同 |
-| test7.txt  | 基本需求4。提供了一个环。测试动态规划能否正确找出所有解。    |
-| test8.txt  | 鲁棒性需求。提供了具有重复单词的文件。测试程序如何处理错误输入。 |
-| test9.txt  | 鲁棒性需求。提供了空文件。此为side case，测试程序的鲁棒性。  |
-| test10.txt | 基本需求4。题目中需求4给出的测试样例。                       |
+| test_1.txt  | 基本需求1，2。题目中需求1给出的测试样例。可测试大小写转化和基本功能 |
+| test_2.txt  | 鲁棒性需求。提供了具有干扰字符的文件。测试程序能否分割输入字符得到单词 |
+| test_3.txt  | 基本需求3。测试程序是否处理了不同搜索起点的情况，该样例从不同的起点开始得到的搜索结果长度不同 |
+| test_4.txt  | 基本需求4。大数据集警告：n=64的合法单词链数目为5016480，运行时间约为3分钟。提供了一幅64个顶点的有向完全图，可以测试程序的搜索性能 |
+| test_5.txt  | 基本需求4。提供了一幅只有两个节点的图，可以测试程序的搜索是否完全，-n参数输出的路径条数是否正确 |
+| test_6.txt  | 基本需求3。用于测试-h/-t分别和-w，-c共同使用时的输出结果是否相同 |
+| test_7.txt  | 基本需求4。提供了一个环。测试动态规划能否正确找出所有解。    |
+| test_8.txt  | 鲁棒性需求。提供了具有重复单词的文件。测试程序如何处理错误输入。 |
+| test_9.txt  | 鲁棒性需求。提供了空文件。此为side case，测试程序的鲁棒性。  |
+| test_10.txt | 基本需求4。题目中需求4给出的测试样例。                       |
 
 
 
@@ -439,7 +439,7 @@ for(int i=1; i<n; i++){
 
 1. 重复单词：自动去重
 
-   示例：test8
+   示例：test_8
 
    ```
    aaa
@@ -450,7 +450,7 @@ for(int i=1; i<n; i++){
    bacon
    ```
 
-   `.\Wordlist_win10.exe -w .\test\test8.txt`
+   `.\Wordlist_win10.exe -w .\test\test_8.txt`
 
    输出结果：
 
@@ -464,9 +464,9 @@ for(int i=1; i<n; i++){
 
 2. 空文件：输出文件为空
 
-   示例：test9(空文件)
+   示例：test_9(空文件)
 
-   `.\Wordlist_win10.exe -w .\test\test9.txt`
+   `.\Wordlist_win10.exe -w .\test\test_9.txt`
 
    输出结果：
 
@@ -474,7 +474,7 @@ for(int i=1; i<n; i++){
 
 3. 干扰字符文件：自动提取符合要求的字符串
 
-   示例：test2
+   示例：test_2
 
    ```
    ab bieiojiosjdfc89biufd.
@@ -482,7 +482,7 @@ for(int i=1; i<n; i++){
    dcfaswc/add,daa
    ```
 
-   .\Wordlist_win10.exe -w .\test\test2.txt
+   .\Wordlist_win10.exe -w .\test\test_2.txt
 
    输出结果：
 
@@ -500,7 +500,7 @@ for(int i=1; i<n; i++){
 
 4. 大小写转化：自动将输入中的大写转化为小写
 
-   示例：test1
+   示例：test_1
 
    ```
    Algebra
@@ -516,7 +516,7 @@ for(int i=1; i<n; i++){
    Pseudopseudohypoparathyroidism
    ```
 
-   .\Wordlist_win10.exe -w .\test\test2.txt
+   .\Wordlist_win10.exe -w .\test\test_2.txt
 
    输出结果：
 
@@ -549,7 +549,7 @@ for(int i=1; i<n; i++){
 
 6. 输入非法参数
 
-   `.\Wordlist_win10.exe -h 2 -w  .\test\test1.txt`
+   `.\Wordlist_win10.exe -h 2 -w  .\test\test_1.txt`
 
    报错：
 
@@ -563,7 +563,7 @@ for(int i=1; i<n; i++){
 
 #### 基本需求1：单词数量最多的单词链
 
-**输入：test1**
+**输入：test_1**
 
 ```
 Algebra
@@ -579,7 +579,7 @@ Trick
 Pseudopseudohypoparathyroidism
 ```
 
-`.\Wordlist.exe -w .\test\test1.txt`
+`.\Wordlist.exe -w .\test\test_1.txt`
 
 **输出结果：与正确结果相同**
 
@@ -594,11 +594,11 @@ trick
 
 #### 基本需求2：指定开头或结尾的字母的单词链
 
-**输入：test1**
+**输入：test_1**
 
 同基本需求1,略去
 
-`.\Wordlist_win10.exe -c .\test\test1.txt`
+`.\Wordlist_win10.exe -c .\test\test_1.txt`
 
 **输出结果：**
 
@@ -611,13 +611,13 @@ moon
 
 #### 基本需求3：指定开头或结尾的字母的单词链
 
-示例测试：输入test1
+示例测试：输入test_1
 
 以下测试结果均正确
 
 **固定开头为e：**
 
-`.\Wordlist_win10.exe -h e -w  .\test\test1.txt`
+`.\Wordlist_win10.exe -h e -w  .\test\test_1.txt`
 
 ```
 elephant
@@ -628,7 +628,7 @@ trick
 
 **固定结尾为t：**
 
-`.\Wordlist_win10.exe -t t -w  .\test\test1.txt`
+`.\Wordlist_win10.exe -t t -w  .\test\test_1.txt`
 
 ```
 algebra
@@ -640,7 +640,7 @@ elephant
 
 **固定开头为a和结尾为t**：
 
-`.\Wordlist_win10.exe -h a -t t -w  .\test\test1.txt`
+`.\Wordlist_win10.exe -h a -t t -w  .\test\test_1.txt`
 
 ```
 algebra
@@ -654,7 +654,7 @@ elephant
 
 1. 考虑到-h/-t可以和-c组合的隐含要求
 
-   test6：
+   test_6：
 
    ```
    abcdefgh hijklmn
@@ -667,7 +667,7 @@ elephant
 
    若输入-h/-t -w, 则寻找固定开头/结尾的单词数最多的单词链
 
-   `.\Wordlist_win10.exe -h a -t n -w  .\test\test6.txt`
+   `.\Wordlist_win10.exe -h a -t n -w  .\test\test_6.txt`
 
    ```
    ab
@@ -678,7 +678,7 @@ elephant
 
    若输入-h/-t  c,  则寻找固定开头/结尾的字母数最多的单词链
 
-   `.\Wordlist_win10.exe -h a -t n -c  .\test\test6.txt`
+   `.\Wordlist_win10.exe -h a -t n -c  .\test\test_6.txt`
 
    ```
    abcdefgh
@@ -691,7 +691,7 @@ elephant
 
    分别输出字母a开头和w开头的字符串
 
-   输入：test3.txt
+   输入：test_3.txt
 
 ```
 ab bc cd de
@@ -703,7 +703,7 @@ uv vw wx xy
 yz
 ```
 
-`.\Wordlist_win10.exe -h a -w .\test\test3.txt`
+`.\Wordlist_win10.exe -h a -w .\test\test_3.txt`
 
 输出结果：
 
@@ -734,7 +734,7 @@ wx
 xy
 yz
 ```
-`.\Wordlist_win10.exe -h w -w .\test\test3.txt`
+`.\Wordlist_win10.exe -h w -w .\test\test_3.txt`
 
 输出结果：
 
@@ -750,7 +750,7 @@ yz
 
 示例测试：
 
-test10
+test_10
 
 输入：
 
@@ -760,7 +760,7 @@ digital
 list 
 ```
 
-`.\Wordlist.exe -n 2 -w .\test\test10.txt`
+`.\Wordlist.exe -n 2 -w .\test\test_10.txt`
 
 输出结果：
 
@@ -781,7 +781,7 @@ digital
 
 * 大数据集：测试算法输出所有结果的时间。5016480个结果约耗时3分钟
 
-  test4：7个节点的有向完全图
+  test_4：7个节点的有向完全图
 
 ```
   ab ac ad ae af ag ah
@@ -794,7 +794,7 @@ digital
   ha hb hc hd he hf hg
 ```
 
-  `.\Wordlist.exe -n 7 -w .\test\test4.txt`
+  `.\Wordlist.exe -n 7 -w .\test\test_4.txt`
 
   输出结果：
 
@@ -816,7 +816,7 @@ digital
 
 * 输出完整性：测试算法是否能输出全部符合要求的单词链
 
-  test5
+  test_5
 
   输入：
 
@@ -835,7 +835,7 @@ digital
   ba
   ```
 
-  `.\Wordlist_win10.exe -n 2 -w .\test\test5.txt`
+  `.\Wordlist_win10.exe -n 2 -w .\test\test_5.txt`
 
   ```
   60
@@ -859,9 +859,9 @@ digital
 
 * 输出完整性/正确性：所有单词构成一个环，测试算法是否能输出所有单词链
 
-  test7
+  test_7
 
-  `.\Wordlist_win10.exe -n 25 -w .\test\test7.txt`
+  `.\Wordlist_win10.exe -n 25 -w .\test\test_7.txt`
 
   输出结果：
 

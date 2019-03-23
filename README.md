@@ -348,3 +348,31 @@ def::search();
 + test3.txt测试程序是否处理了不同搜索起点的情况，该样例从不同的起点开始得到的搜索结果长度不同
 + test4.txt提供了一幅4个顶点的有向完全图，可以测试程序的搜索性能
 + test5.txt，提供了一幅只有两个节点的图，可以测试程序的搜索是否完全，-n参数输出的路径条数是否正确
+
+## 超时处理
+由于算法的时间复杂度是指数级的，因此在对于复杂问题进行处理时可能会花费过长时间，因此我们设置了超时机制，如果搜索时间超过15秒，就停止搜索，输出当前得到的最长的单词链。
+```C
+void signalHandler(int m){
+    //超时处理函数：输出DFS当前查找到的最长单词链
+    std::cout<<"Time limits. The word list output may not be the longest one."<<std::endl;
+    std::ofstream mycout("solution.txt");
+    for (int i=0;i<longestList.size();i++){
+        mycout<<longestList[i]<<std::endl;
+    }
+    exit(0);
+}
+
+void initTimer(int sec){
+    //设置定时器，搜索sec秒后停止搜索
+    struct itimerval value;
+    value.it_value.tv_sec=sec;
+    value.it_value.tv_usec=0;
+    value.it_interval=value.it_value;
+    setitimer(ITIMER_REAL,&value,NULL);
+}
+void search(){  
+    signal(SIGALRM, signalHandler);
+    initTimer(15);
+    ...
+}
+```
