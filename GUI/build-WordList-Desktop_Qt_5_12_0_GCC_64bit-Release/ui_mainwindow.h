@@ -199,7 +199,7 @@ public:
 
         fixNumber = new QSpinBox(centralWidget);
         fixNumber->setObjectName(QString::fromUtf8("fixNumber"));
-        fixNumber->setMinimum(1);
+        fixNumber->setMinimum(2);
 
         horizontalLayout->addWidget(fixNumber);
 

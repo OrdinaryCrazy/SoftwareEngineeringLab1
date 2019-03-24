@@ -7,6 +7,7 @@
 #include <QProcess>
 #include <QTextBlock>
 #include <QTextDocument>
+#include <QProgressBar>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
