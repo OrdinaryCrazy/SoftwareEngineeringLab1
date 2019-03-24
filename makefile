@@ -8,7 +8,7 @@ LIBS = 	defaultCase.h\
 
 $(TARGET): 	main.cpp\
 			$(LIBS)	
-	@ $(CXX) $< -o $@ -std=c++11
+	@ $(CXX) $< -o $@ -std=c++11 --static
 
 all: $(TARGET)
 
