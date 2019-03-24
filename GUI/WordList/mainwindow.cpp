@@ -117,7 +117,6 @@ void MainWindow::on_convertButton_clicked()
 }
 void MainWindow::Result(int a)
 {
-    //std::cout<<a<<std::endl;
     if (1 == a)
     {
         QLabel* label = new QLabel();
