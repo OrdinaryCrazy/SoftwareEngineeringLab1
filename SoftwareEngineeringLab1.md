@@ -28,15 +28,27 @@
 
 工程框架为：
 
-![](D:\labs_software_engineering\SoftwareEngineeringLab1\images\architecture.png)
+![](\images\architecture.png)
 
 ## 2. 编译环境
 
-* `Windows`下`g++` 编译 得可执行文件
+* 操作系统：`Ubuntu 18.10`
 
-* `Ubuntu16.04`下通过`makefile`编译
+* 编译器版本：`g++ (Ubuntu 8.2.0-7ubuntu1) 8.2.0`
 
-  
+* 自动编译：（环境配置：`GNU Make 4.2.1`）
+
+```shell
+$ cd ./src
+$ make
+```
+
+* 直接编译：
+
+```shell
+$ g++ main.cpp -o ./Wordlist -std=c++11 -static
+```
+
 
 ## 3. GUI使用说明
 
@@ -44,17 +56,29 @@
 
 ### 开发环境
 
-| 操作系统     | Ubuntu 18.10                          |
-| ------------ | ------------------------------------- |
-| **编译环境** | **g++ (Ubuntu 8.2.0-7ubuntu1) 8.2.0** |
-| **图形库**   | **Qt 5.12.0 GCC64bit**                |
-| **设计工具** | **Qt Creator 4.8.0**                  |
+| 操作系统        | Ubuntu 18.10                          |
+| --------------- | ------------------------------------- |
+| **编译环境**    | **g++ (Ubuntu 8.2.0-7ubuntu1) 8.2.0** |
+| **图形库**      | **Qt 5.12.0 GCC64bit**                |
+| **设计工具**    | **Qt Creator 4.8.0**                  |
+* 编译方法：
+
+1. 使用Qt Creator 构建项目
+2. 若不具备Qt Creator，则建议如下编译：
+
+```shell
+$ qmake WordList.pro -spec linux-g++ CONFIG+=qtquickcompiler
+$ cd ../build-WordList-Desktop_Qt_5_12_0_GCC_64bit-Release/
+$ make
+```
+
+
 
 * 依赖库说明：将上述命令行程序作为依赖库添加在图形化程序目录下，重命名为`WordlistCUI`
 
 ### 界面说明及控件对应关系
 
-![](D:/labs_software_engineering/SoftwareEngineeringLab1/GUI.png)
+![](./GUI.png)
 
 - 输入区：`QPlainTextEdit InputText`
 - 输出区：`QTextBrowser outputText`
