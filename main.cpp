@@ -41,7 +41,7 @@ int main (int argc, char*argv[]){
     bool fixedTail = false;     //确定结尾字母模式开关
     int wordNum;                //确定单词数量模式对应的单词数量
     std::string inputFile;      //数据文件名
-    char head,tail;             //确定的开头字母和结尾字母
+    char head=0,tail=0;             //确定的开头字母和结尾字母
 
     if (argc<=2){
         std::cout<<"Too few arguments."<<std::endl;
@@ -122,7 +122,7 @@ int main (int argc, char*argv[]){
         }
     }
     
-    if (mostChar==mostWord || (fixedWordNum && (fixedTail || fixedHead || mostChar)) ){
+    if (mostChar==mostWord || (fixedWordNum &&  mostChar) ){
         std::cout<< "Wrong argument usage." <<std::endl;
         usage();
     }
@@ -179,6 +179,9 @@ int main (int argc, char*argv[]){
         sHoT::printSolution();
     }
     if(fixedWordNum){
-        sWN::request4(crudeData, wordNum);
+        if(fixedHead && fixedTail) sWN::request4(crudeData, wordNum, head,tail);
+        else if(fixedHead) sWN::request4(crudeData, wordNum,head,0);
+        else if(fixedTail) sWN::request4(crudeData, wordNum,0,tail);
+        else sWN::request4(crudeData, wordNum);
     }
 }
