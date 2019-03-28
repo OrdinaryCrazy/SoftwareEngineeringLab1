@@ -27,27 +27,27 @@ $ g++ main.cpp -o ./Wordlist -std=c++11 -static
 
 
 ### 使用方法
-
+```shell
 Usage: Wordlist [arguments] <filename>
 
-**Mandatory arguments:**
+Mandatory arguments:
 
-`-c`: Output one word list with the most characters.
+	`-c`: Output one word list with the most characters.
 
-`-w`: Output one word list with the most words.
+	`-w`: Output one word list with the most words.
 
-**Optional arguments:   **
+Optional arguments:   
 
-`-h <char>`: Determine the head character of the word list. 
+	`-h <char>`: Determine the head character of the word list. 
 
-`-t <char>`: Determine the tail character of the word list.
+	`-t <char>`: Determine the tail character of the word list.
 
-  (Note: -h and -t can be used at the same time)
+	  (Note: -h and -t can be used at the same time)
 
-`-n <num>`: Output all word lists containing <num> words.
+	`-n <num>`: Output all word lists containing <num> words.
 
-(Note: -n must be used with -w)
-
+	(Note: -n must be used with -w)
+```
 
 
 ## GUI使用说明
@@ -76,6 +76,6 @@ $ make
 
 
 
-### 界面概览
+### 界面概览(按提示使用即可)
 
 ![](./GUI.png)
