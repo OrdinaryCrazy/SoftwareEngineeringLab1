@@ -3,125 +3,91 @@
 #include "specifiedWordNumbers.h"
 #include "defaultCase.h"
 #include <algorithm>
-#include <string>
-
-int CoreImplement::gen_chain_word(char* words[], int len, char* result[], char head, char tail)
-{
-    std::vector<std::string> wordList = std::vector<std::string>();
-    for(int i = 0;i < len;i++){
-        std::string tmp = std::string(words[i]);
-        transform(tmp.begin(),tmp.end(),tmp.begin(),::tolower);
-        wordList.push_back(tmp);
+// g++ -fno=rtti test.cpp ../CoreImplement.cpp 
+int CoreImplement::gen_chain_word(std::vector<std::string> &words, std::vector<std::string> &result, char head, char tail)
+{   
+    for(int i = 0;i < words.size();i++){
+        transform(words[i].begin(),words[i].end(),words[i].begin(),::tolower);
     }
-    sort(wordList.begin(),wordList.end());
-    std::vector<std::string>::iterator iter = unique(wordList.begin(),wordList.end());
-    wordList.erase(iter,wordList.end());
 
     if(head == 0 && tail ==0){
-        def::makeGraph(wordList,0);
+        def::makeGraph(words,0);
         def::search();
 
-        result = new char*[def::longestList.size()];
-        for(int i = 0;i < def::longestList.size();i++){
-            result[i] = def::longestList[i].toCharArray();
-        }
-        return def::longestList.size();
+        result = def::longestList;
+        return result.size();
     }
     else{
         if(head != 0 && tail == 0){
             signal(SIGALRM, sHoT::signalHandler);
             sHoT::initTimer(15);
-            sHoT::findPathWithSpecifiedHead(sHoT::buildGraph(wordList,true,true),head);
+            sHoT::findPathWithSpecifiedHead(sHoT::buildGraph(words,true,true),head);
 
-            result = new char*[sHoT::resultPath.size()];
-            for(int i = 0;i < sHoT::resultPath.size();i++){
-                result[i] = sHoT::resultPath[i].toCharArray();
-            }
-            return sHoT::resultPath.size();
+            result = sHoT::resultPath;
+            return result.size();
         }
         if(head == 0 && tail != 0){
             signal(SIGALRM, sHoT::signalHandler);
             sHoT::initTimer(15);
-            sHoT::findPathWithSpecifiedTail(sHoT::buildGraph(wordList,true,false),tail);
+            sHoT::findPathWithSpecifiedTail(sHoT::buildGraph(words,true,false),tail);
 
-            result = new char*[sHoT::resultPath.size()];
-            for(int i = 0;i < sHoT::resultPath.size();i++){
-                result[i] = sHoT::resultPath[i].toCharArray();
-            }
-            return sHoT::resultPath.size();
+            result = sHoT::resultPath;
+            return result.size();
         }
         if(head != 0 && tail != 0){
             signal(SIGALRM, sHoT::signalHandler);
             sHoT::initTimer(15);
-            sHoT::findPathWithSpecifiedHeadAndTail(sHoT::buildGraph(wordList,true,true),head,tail);
+            sHoT::findPathWithSpecifiedHeadAndTail(sHoT::buildGraph(words,true,true),head,tail);
 
-            result = new char*[sHoT::resultPath.size()];
-            for(int i = 0;i < sHoT::resultPath.size();i++){
-                result[i] = sHoT::resultPath[i].toCharArray();
-            }
-            return sHoT::resultPath.size();
+            result = sHoT::resultPath;
+            return result.size();
         }
+        return 0;
     }
 }
 
-int CoreImplement::gen_chain_char(char* words[], int len, char* result[], char head, char tail)
-{
-    std::vector<std::string> wordList = std::vector<std::string>();
-    for(int i = 0;i < len;i++){
-        std::string tmp = std::string(words[i]);
-        transform(tmp.begin(),tmp.end(),tmp.begin(),::tolower);
-        wordList.push_back(tmp);
+int CoreImplement::gen_chain_char(std::vector<std::string> &words, std::vector<std::string> &result, char head, char tail)
+{   
+    for(int i = 0;i < words.size();i++){
+        transform(words[i].begin(),words[i].end(),words[i].begin(),::toupper);
     }
-    sort(wordList.begin(),wordList.end());
-    std::vector<std::string>::iterator iter = unique(wordList.begin(),wordList.end());
-    wordList.erase(iter,wordList.end());
 
     if(head == 0 && tail ==0){
-        def::makeGraph(wordList,1);
+        def::makeGraph(words,1);
         def::search();
 
-        result = new char*[def::longestList.size()];
-        for(int i = 0;i < def::longestList.size();i++){
-            result[i] = def::longestList[i].toCharArray();
-        }
-        return def::longestList.size();
+        result = def::longestList;
+        return result.size();
     }
     else{
         if(head != 0 && tail == 0){
             signal(SIGALRM, sHoT::signalHandler);
             sHoT::initTimer(15);
-            sHoT::findPathWithSpecifiedHead(sHoT::buildGraph(wordList,false,true),head);
+            sHoT::findPathWithSpecifiedHead(sHoT::buildGraph(words,false,true),head);
 
-            result = new char*[sHoT::resultPath.size()];
-            for(int i = 0;i < sHoT::resultPath.size();i++){
-                result[i] = sHoT::resultPath[i].toCharArray();
-            }
-            return sHoT::resultPath.size();
+            result = sHoT::resultPath;
+            return result.size();
         }
         if(head == 0 && tail != 0){
             signal(SIGALRM, sHoT::signalHandler);
             sHoT::initTimer(15);
-            sHoT::findPathWithSpecifiedTail(sHoT::buildGraph(wordList,false,false),tail);
+            sHoT::findPathWithSpecifiedTail(sHoT::buildGraph(words,false,false),tail);
 
-            result = new char*[sHoT::resultPath.size()];
-            for(int i = 0;i < sHoT::resultPath.size();i++){
-                result[i] = sHoT::resultPath[i].toCharArray();
-            }
-            return sHoT::resultPath.size();
+            result = sHoT::resultPath;
+            return result.size();
         }
         if(head != 0 && tail != 0){
             signal(SIGALRM, sHoT::signalHandler);
             sHoT::initTimer(15);
-            sHoT::findPathWithSpecifiedHeadAndTail(sHoT::buildGraph(wordList,false,true),head,tail);
+            sHoT::findPathWithSpecifiedHeadAndTail(sHoT::buildGraph(words,false,true),head,tail);
 
-            result = new char*[sHoT::resultPath.size()];
-            for(int i = 0;i < sHoT::resultPath.size();i++){
-                result[i] = sHoT::resultPath[i].toCharArray();
-            }
-            return sHoT::resultPath.size();
+            result = sHoT::resultPath;
+            return result.size();
         }
+        return 0;
     }
 }
+/**
 _declspec(dllexport)bool GetCore(void** _RtObject)
 {
     Core* core = NULL;
@@ -129,3 +95,4 @@ _declspec(dllexport)bool GetCore(void** _RtObject)
     *_RtObject = (void*)core;
     return true;
 }
+**/
