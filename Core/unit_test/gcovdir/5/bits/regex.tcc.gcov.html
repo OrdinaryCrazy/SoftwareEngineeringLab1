@@ -1,0 +1,754 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - CoreImplement.info - 5/bits/regex.tcc</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">5/bits</a> - regex.tcc<span style="font-size: 80%;"> (source / <a href="regex.tcc.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">CoreImplement.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">64</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-03-31 00:09:46</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : // class template regex -*- C++ -*-</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            : // Copyright (C) 2013-2015 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : // This file is part of the GNU ISO C++ Library.  This library is free
+<span class="lineNum">       6 </span>            : // software; you can redistribute it and/or modify it under the
+<span class="lineNum">       7 </span>            : // terms of the GNU General Public License as published by the
+<span class="lineNum">       8 </span>            : // Free Software Foundation; either version 3, or (at your option)
+<span class="lineNum">       9 </span>            : // any later version.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : // This library is distributed in the hope that it will be useful,
+<span class="lineNum">      12 </span>            : // but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      13 </span>            : // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      14 </span>            : // GNU General Public License for more details.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : // Under Section 7 of GPL version 3, you are granted additional
+<span class="lineNum">      17 </span>            : // permissions described in the GCC Runtime Library Exception, version
+<span class="lineNum">      18 </span>            : // 3.1, as published by the Free Software Foundation.
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : // You should have received a copy of the GNU General Public License and
+<span class="lineNum">      21 </span>            : // a copy of the GCC Runtime Library Exception along with this program;
+<span class="lineNum">      22 </span>            : // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+<span class="lineNum">      23 </span>            : // &lt;http://www.gnu.org/licenses/&gt;.
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : /**
+<span class="lineNum">      26 </span>            :  *  @file bits/regex.tcc
+<span class="lineNum">      27 </span>            :  *  This is an internal header file, included by other library headers.
+<span class="lineNum">      28 </span>            :  *  Do not attempt to use it directly. @headername{regex}
+<span class="lineNum">      29 </span>            :  */
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : // A non-standard switch to let the user pick the matching algorithm.
+<span class="lineNum">      32 </span>            : // If _GLIBCXX_REGEX_USE_THOMPSON_NFA is defined, the thompson NFA
+<span class="lineNum">      33 </span>            : // algorithm will be used. This algorithm is not enabled by default,
+<span class="lineNum">      34 </span>            : // and cannot be used if the regex contains back-references, but has better
+<span class="lineNum">      35 </span>            : // (polynomial instead of exponential) worst case performance.
+<span class="lineNum">      36 </span>            : // See __regex_algo_impl below.
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            : namespace std _GLIBCXX_VISIBILITY(default)
+<span class="lineNum">      39 </span>            : {
+<span class="lineNum">      40 </span>            : namespace __detail
+<span class="lineNum">      41 </span>            : {
+<span class="lineNum">      42 </span>            : _GLIBCXX_BEGIN_NAMESPACE_VERSION
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            :   // Result of merging regex_match and regex_search.
+<span class="lineNum">      45 </span>            :   //
+<span class="lineNum">      46 </span>            :   // __policy now can be _S_auto (auto dispatch) and _S_alternate (use
+<span class="lineNum">      47 </span>            :   // the other one if possible, for test purpose).
+<span class="lineNum">      48 </span>            :   //
+<span class="lineNum">      49 </span>            :   // That __match_mode is true means regex_match, else regex_search.
+<span class="lineNum">      50 </span>            :   template&lt;typename _BiIter, typename _Alloc,
+<span class="lineNum">      51 </span>            :            typename _CharT, typename _TraitsT,
+<span class="lineNum">      52 </span>            :            _RegexExecutorPolicy __policy,
+<a name="53"><span class="lineNum">      53 </span>            :            bool __match_mode&gt;</a>
+<span class="lineNum">      54 </span>            :     bool
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :     __regex_algo_impl(_BiIter                              __s,</span>
+<span class="lineNum">      56 </span>            :                       _BiIter                              __e,
+<span class="lineNum">      57 </span>            :                       match_results&lt;_BiIter, _Alloc&gt;&amp;      __m,
+<span class="lineNum">      58 </span>            :                       const basic_regex&lt;_CharT, _TraitsT&gt;&amp; __re,
+<span class="lineNum">      59 </span>            :                       regex_constants::match_flag_type     __flags)
+<span class="lineNum">      60 </span>            :     {
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :       if (__re._M_automaton == nullptr)</span>
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :         return false;</span>
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :       typename match_results&lt;_BiIter, _Alloc&gt;::_Base_type&amp; __res = __m;</span>
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :       __m._M_begin = __s;</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :       __m._M_resize(__re._M_automaton-&gt;_M_sub_count());</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :       for (auto&amp; __it : __res)</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :         __it.matched = false;</span>
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            :       // __policy is used by testsuites so that they can use Thompson NFA
+<span class="lineNum">      71 </span>            :       // without defining a macro. Users should define
+<span class="lineNum">      72 </span>            :       // _GLIBCXX_REGEX_USE_THOMPSON_NFA if they need to use this approach.
+<span class="lineNum">      73 </span>            :       bool __ret;
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :       if (!__re._M_automaton-&gt;_M_has_backref</span>
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :           &amp;&amp; !(__re._M_flags &amp; regex_constants::ECMAScript)</span>
+<span class="lineNum">      76 </span>            : #ifndef _GLIBCXX_REGEX_USE_THOMPSON_NFA
+<span class="lineNum">      77 </span>            :           &amp;&amp; __policy == _RegexExecutorPolicy::_S_alternate
+<span class="lineNum">      78 </span>            : #endif
+<span class="lineNum">      79 </span>            :           )
+<span class="lineNum">      80 </span>            :         {
+<span class="lineNum">      81 </span>            :           _Executor&lt;_BiIter, _Alloc, _TraitsT, false&gt;
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :             __executor(__s, __e, __m, __re, __flags);</span>
+<span class="lineNum">      83 </span>            :           if (__match_mode)
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :             __ret = __executor._M_match();</span>
+<span class="lineNum">      85 </span>            :           else
+<span class="lineNum">      86 </span>            :             __ret = __executor._M_search();
+<span class="lineNum">      87 </span>            :         }
+<span class="lineNum">      88 </span>            :       else
+<span class="lineNum">      89 </span>            :         {
+<span class="lineNum">      90 </span>            :           _Executor&lt;_BiIter, _Alloc, _TraitsT, true&gt;
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :             __executor(__s, __e, __m, __re, __flags);</span>
+<span class="lineNum">      92 </span>            :           if (__match_mode)
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :             __ret = __executor._M_match();</span>
+<span class="lineNum">      94 </span>            :           else
+<span class="lineNum">      95 </span>            :             __ret = __executor._M_search();
+<span class="lineNum">      96 </span>            :         }
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :       if (__ret)</span>
+<span class="lineNum">      98 </span>            :         {
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :           for (auto&amp; __it : __res)</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :             if (!__it.matched)</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :               __it.first = __it.second = __e;</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :           auto&amp; __pre = __m._M_prefix();</span>
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :           auto&amp; __suf = __m._M_suffix();</span>
+<span class="lineNum">     104 </span>            :           if (__match_mode)
+<span class="lineNum">     105 </span>            :             {
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :               __pre.matched = false;</span>
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :               __pre.first = __s;</span>
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :               __pre.second = __s;</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :               __suf.matched = false;</span>
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :               __suf.first = __e;</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :               __suf.second = __e;</span>
+<span class="lineNum">     112 </span>            :             }
+<span class="lineNum">     113 </span>            :           else
+<span class="lineNum">     114 </span>            :             {
+<span class="lineNum">     115 </span>            :               __pre.first = __s;
+<span class="lineNum">     116 </span>            :               __pre.second = __res[0].first;
+<span class="lineNum">     117 </span>            :               __pre.matched = (__pre.first != __pre.second);
+<span class="lineNum">     118 </span>            :               __suf.first = __res[0].second;
+<span class="lineNum">     119 </span>            :               __suf.second = __e;
+<span class="lineNum">     120 </span>            :               __suf.matched = (__suf.first != __suf.second);
+<span class="lineNum">     121 </span>            :             }
+<span class="lineNum">     122 </span>            :         }
+<span class="lineNum">     123 </span>            :       else
+<span class="lineNum">     124 </span>            :         {
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :           __m._M_resize(0);</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :           for (auto&amp; __it : __res)</span>
+<span class="lineNum">     127 </span>            :             {
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :               __it.matched = false;</span>
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :               __it.first = __it.second = __e;</span>
+<span class="lineNum">     130 </span>            :             }
+<span class="lineNum">     131 </span>            :         }
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :       return __ret;</span>
+<span class="lineNum">     133 </span>            :     }
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span>            : _GLIBCXX_END_NAMESPACE_VERSION
+<span class="lineNum">     136 </span>            : }
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            : _GLIBCXX_BEGIN_NAMESPACE_VERSION
+<span class="lineNum">     139 </span>            : 
+<span class="lineNum">     140 </span>            :   template&lt;typename _Ch_type&gt;
+<a name="141"><span class="lineNum">     141 </span>            :   template&lt;typename _Fwd_iter&gt;</a>
+<span class="lineNum">     142 </span>            :     typename regex_traits&lt;_Ch_type&gt;::string_type
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :     regex_traits&lt;_Ch_type&gt;::</span>
+<span class="lineNum">     144 </span>            :     lookup_collatename(_Fwd_iter __first, _Fwd_iter __last) const
+<span class="lineNum">     145 </span>            :     {
+<span class="lineNum">     146 </span>            :       typedef std::ctype&lt;char_type&gt; __ctype_type;
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :       const __ctype_type&amp; __fctyp(use_facet&lt;__ctype_type&gt;(_M_locale));</span>
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span>            :       static const char* __collatenames[] =
+<span class="lineNum">     150 </span>            :         {
+<span class="lineNum">     151 </span>            :           &quot;NUL&quot;,
+<span class="lineNum">     152 </span>            :           &quot;SOH&quot;,
+<span class="lineNum">     153 </span>            :           &quot;STX&quot;,
+<span class="lineNum">     154 </span>            :           &quot;ETX&quot;,
+<span class="lineNum">     155 </span>            :           &quot;EOT&quot;,
+<span class="lineNum">     156 </span>            :           &quot;ENQ&quot;,
+<span class="lineNum">     157 </span>            :           &quot;ACK&quot;,
+<span class="lineNum">     158 </span>            :           &quot;alert&quot;,
+<span class="lineNum">     159 </span>            :           &quot;backspace&quot;,
+<span class="lineNum">     160 </span>            :           &quot;tab&quot;,
+<span class="lineNum">     161 </span>            :           &quot;newline&quot;,
+<span class="lineNum">     162 </span>            :           &quot;vertical-tab&quot;,
+<span class="lineNum">     163 </span>            :           &quot;form-feed&quot;,
+<span class="lineNum">     164 </span>            :           &quot;carriage-return&quot;,
+<span class="lineNum">     165 </span>            :           &quot;SO&quot;,
+<span class="lineNum">     166 </span>            :           &quot;SI&quot;,
+<span class="lineNum">     167 </span>            :           &quot;DLE&quot;,
+<span class="lineNum">     168 </span>            :           &quot;DC1&quot;,
+<span class="lineNum">     169 </span>            :           &quot;DC2&quot;,
+<span class="lineNum">     170 </span>            :           &quot;DC3&quot;,
+<span class="lineNum">     171 </span>            :           &quot;DC4&quot;,
+<span class="lineNum">     172 </span>            :           &quot;NAK&quot;,
+<span class="lineNum">     173 </span>            :           &quot;SYN&quot;,
+<span class="lineNum">     174 </span>            :           &quot;ETB&quot;,
+<span class="lineNum">     175 </span>            :           &quot;CAN&quot;,
+<span class="lineNum">     176 </span>            :           &quot;EM&quot;,
+<span class="lineNum">     177 </span>            :           &quot;SUB&quot;,
+<span class="lineNum">     178 </span>            :           &quot;ESC&quot;,
+<span class="lineNum">     179 </span>            :           &quot;IS4&quot;,
+<span class="lineNum">     180 </span>            :           &quot;IS3&quot;,
+<span class="lineNum">     181 </span>            :           &quot;IS2&quot;,
+<span class="lineNum">     182 </span>            :           &quot;IS1&quot;,
+<span class="lineNum">     183 </span>            :           &quot;space&quot;,
+<span class="lineNum">     184 </span>            :           &quot;exclamation-mark&quot;,
+<span class="lineNum">     185 </span>            :           &quot;quotation-mark&quot;,
+<span class="lineNum">     186 </span>            :           &quot;number-sign&quot;,
+<span class="lineNum">     187 </span>            :           &quot;dollar-sign&quot;,
+<span class="lineNum">     188 </span>            :           &quot;percent-sign&quot;,
+<span class="lineNum">     189 </span>            :           &quot;ampersand&quot;,
+<span class="lineNum">     190 </span>            :           &quot;apostrophe&quot;,
+<span class="lineNum">     191 </span>            :           &quot;left-parenthesis&quot;,
+<span class="lineNum">     192 </span>            :           &quot;right-parenthesis&quot;,
+<span class="lineNum">     193 </span>            :           &quot;asterisk&quot;,
+<span class="lineNum">     194 </span>            :           &quot;plus-sign&quot;,
+<span class="lineNum">     195 </span>            :           &quot;comma&quot;,
+<span class="lineNum">     196 </span>            :           &quot;hyphen&quot;,
+<span class="lineNum">     197 </span>            :           &quot;period&quot;,
+<span class="lineNum">     198 </span>            :           &quot;slash&quot;,
+<span class="lineNum">     199 </span>            :           &quot;zero&quot;,
+<span class="lineNum">     200 </span>            :           &quot;one&quot;,
+<span class="lineNum">     201 </span>            :           &quot;two&quot;,
+<span class="lineNum">     202 </span>            :           &quot;three&quot;,
+<span class="lineNum">     203 </span>            :           &quot;four&quot;,
+<span class="lineNum">     204 </span>            :           &quot;five&quot;,
+<span class="lineNum">     205 </span>            :           &quot;six&quot;,
+<span class="lineNum">     206 </span>            :           &quot;seven&quot;,
+<span class="lineNum">     207 </span>            :           &quot;eight&quot;,
+<span class="lineNum">     208 </span>            :           &quot;nine&quot;,
+<span class="lineNum">     209 </span>            :           &quot;colon&quot;,
+<span class="lineNum">     210 </span>            :           &quot;semicolon&quot;,
+<span class="lineNum">     211 </span>            :           &quot;less-than-sign&quot;,
+<span class="lineNum">     212 </span>            :           &quot;equals-sign&quot;,
+<span class="lineNum">     213 </span>            :           &quot;greater-than-sign&quot;,
+<span class="lineNum">     214 </span>            :           &quot;question-mark&quot;,
+<span class="lineNum">     215 </span>            :           &quot;commercial-at&quot;,
+<span class="lineNum">     216 </span>            :           &quot;A&quot;,
+<span class="lineNum">     217 </span>            :           &quot;B&quot;,
+<span class="lineNum">     218 </span>            :           &quot;C&quot;,
+<span class="lineNum">     219 </span>            :           &quot;D&quot;,
+<span class="lineNum">     220 </span>            :           &quot;E&quot;,
+<span class="lineNum">     221 </span>            :           &quot;F&quot;,
+<span class="lineNum">     222 </span>            :           &quot;G&quot;,
+<span class="lineNum">     223 </span>            :           &quot;H&quot;,
+<span class="lineNum">     224 </span>            :           &quot;I&quot;,
+<span class="lineNum">     225 </span>            :           &quot;J&quot;,
+<span class="lineNum">     226 </span>            :           &quot;K&quot;,
+<span class="lineNum">     227 </span>            :           &quot;L&quot;,
+<span class="lineNum">     228 </span>            :           &quot;M&quot;,
+<span class="lineNum">     229 </span>            :           &quot;N&quot;,
+<span class="lineNum">     230 </span>            :           &quot;O&quot;,
+<span class="lineNum">     231 </span>            :           &quot;P&quot;,
+<span class="lineNum">     232 </span>            :           &quot;Q&quot;,
+<span class="lineNum">     233 </span>            :           &quot;R&quot;,
+<span class="lineNum">     234 </span>            :           &quot;S&quot;,
+<span class="lineNum">     235 </span>            :           &quot;T&quot;,
+<span class="lineNum">     236 </span>            :           &quot;U&quot;,
+<span class="lineNum">     237 </span>            :           &quot;V&quot;,
+<span class="lineNum">     238 </span>            :           &quot;W&quot;,
+<span class="lineNum">     239 </span>            :           &quot;X&quot;,
+<span class="lineNum">     240 </span>            :           &quot;Y&quot;,
+<span class="lineNum">     241 </span>            :           &quot;Z&quot;,
+<span class="lineNum">     242 </span>            :           &quot;left-square-bracket&quot;,
+<span class="lineNum">     243 </span>            :           &quot;backslash&quot;,
+<span class="lineNum">     244 </span>            :           &quot;right-square-bracket&quot;,
+<span class="lineNum">     245 </span>            :           &quot;circumflex&quot;,
+<span class="lineNum">     246 </span>            :           &quot;underscore&quot;,
+<span class="lineNum">     247 </span>            :           &quot;grave-accent&quot;,
+<span class="lineNum">     248 </span>            :           &quot;a&quot;,
+<span class="lineNum">     249 </span>            :           &quot;b&quot;,
+<span class="lineNum">     250 </span>            :           &quot;c&quot;,
+<span class="lineNum">     251 </span>            :           &quot;d&quot;,
+<span class="lineNum">     252 </span>            :           &quot;e&quot;,
+<span class="lineNum">     253 </span>            :           &quot;f&quot;,
+<span class="lineNum">     254 </span>            :           &quot;g&quot;,
+<span class="lineNum">     255 </span>            :           &quot;h&quot;,
+<span class="lineNum">     256 </span>            :           &quot;i&quot;,
+<span class="lineNum">     257 </span>            :           &quot;j&quot;,
+<span class="lineNum">     258 </span>            :           &quot;k&quot;,
+<span class="lineNum">     259 </span>            :           &quot;l&quot;,
+<span class="lineNum">     260 </span>            :           &quot;m&quot;,
+<span class="lineNum">     261 </span>            :           &quot;n&quot;,
+<span class="lineNum">     262 </span>            :           &quot;o&quot;,
+<span class="lineNum">     263 </span>            :           &quot;p&quot;,
+<span class="lineNum">     264 </span>            :           &quot;q&quot;,
+<span class="lineNum">     265 </span>            :           &quot;r&quot;,
+<span class="lineNum">     266 </span>            :           &quot;s&quot;,
+<span class="lineNum">     267 </span>            :           &quot;t&quot;,
+<span class="lineNum">     268 </span>            :           &quot;u&quot;,
+<span class="lineNum">     269 </span>            :           &quot;v&quot;,
+<span class="lineNum">     270 </span>            :           &quot;w&quot;,
+<span class="lineNum">     271 </span>            :           &quot;x&quot;,
+<span class="lineNum">     272 </span>            :           &quot;y&quot;,
+<span class="lineNum">     273 </span>            :           &quot;z&quot;,
+<span class="lineNum">     274 </span>            :           &quot;left-curly-bracket&quot;,
+<span class="lineNum">     275 </span>            :           &quot;vertical-line&quot;,
+<span class="lineNum">     276 </span>            :           &quot;right-curly-bracket&quot;,
+<span class="lineNum">     277 </span>            :           &quot;tilde&quot;,
+<span class="lineNum">     278 </span>            :           &quot;DEL&quot;,
+<span class="lineNum">     279 </span>            :         };
+<span class="lineNum">     280 </span>            : 
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :       string __s;</span>
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :       for (; __first != __last; ++__first)</span>
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :         __s += __fctyp.narrow(*__first, 0);</span>
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span><span class="lineNoCov">          0 :       for (const auto&amp; __it : __collatenames)</span>
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :         if (__s == __it)</span>
+<span class="lineNum">     287 </span>            :           return string_type(1, __fctyp.widen(
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :             static_cast&lt;char&gt;(&amp;__it - __collatenames)));</span>
+<span class="lineNum">     289 </span>            : 
+<span class="lineNum">     290 </span>            :       // TODO Add digraph support:
+<span class="lineNum">     291 </span>            :       // http://boost.sourceforge.net/libs/regex/doc/collating_names.html
+<span class="lineNum">     292 </span>            : 
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :       return string_type();</span>
+<span class="lineNum">     294 </span>            :     }
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span>            :   template&lt;typename _Ch_type&gt;
+<a name="297"><span class="lineNum">     297 </span>            :   template&lt;typename _Fwd_iter&gt;</a>
+<span class="lineNum">     298 </span>            :     typename regex_traits&lt;_Ch_type&gt;::char_class_type
+<span class="lineNum">     299 </span><span class="lineNoCov">          0 :     regex_traits&lt;_Ch_type&gt;::</span>
+<span class="lineNum">     300 </span>            :     lookup_classname(_Fwd_iter __first, _Fwd_iter __last, bool __icase) const
+<span class="lineNum">     301 </span>            :     {
+<span class="lineNum">     302 </span>            :       typedef std::ctype&lt;char_type&gt; __ctype_type;
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :       const __ctype_type&amp; __fctyp(use_facet&lt;__ctype_type&gt;(_M_locale));</span>
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span>            :       // Mappings from class name to class mask.
+<span class="lineNum">     306 </span>            :       static const pair&lt;const char*, char_class_type&gt; __classnames[] =
+<span class="lineNum">     307 </span>            :       {
+<span class="lineNum">     308 </span>            :         {&quot;d&quot;, ctype_base::digit},
+<span class="lineNum">     309 </span>            :         {&quot;w&quot;, {ctype_base::alnum, _RegexMask::_S_under}},
+<span class="lineNum">     310 </span>            :         {&quot;s&quot;, ctype_base::space},
+<span class="lineNum">     311 </span>            :         {&quot;alnum&quot;, ctype_base::alnum},
+<span class="lineNum">     312 </span>            :         {&quot;alpha&quot;, ctype_base::alpha},
+<span class="lineNum">     313 </span>            :         {&quot;blank&quot;, ctype_base::blank},
+<span class="lineNum">     314 </span>            :         {&quot;cntrl&quot;, ctype_base::cntrl},
+<span class="lineNum">     315 </span>            :         {&quot;digit&quot;, ctype_base::digit},
+<span class="lineNum">     316 </span>            :         {&quot;graph&quot;, ctype_base::graph},
+<span class="lineNum">     317 </span>            :         {&quot;lower&quot;, ctype_base::lower},
+<span class="lineNum">     318 </span>            :         {&quot;print&quot;, ctype_base::print},
+<span class="lineNum">     319 </span>            :         {&quot;punct&quot;, ctype_base::punct},
+<span class="lineNum">     320 </span>            :         {&quot;space&quot;, ctype_base::space},
+<span class="lineNum">     321 </span>            :         {&quot;upper&quot;, ctype_base::upper},
+<span class="lineNum">     322 </span>            :         {&quot;xdigit&quot;, ctype_base::xdigit},
+<span class="lineNum">     323 </span>            :       };
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span><span class="lineNoCov">          0 :       string __s;</span>
+<span class="lineNum">     326 </span><span class="lineNoCov">          0 :       for (; __first != __last; ++__first)</span>
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :         __s += __fctyp.narrow(__fctyp.tolower(*__first), 0);</span>
+<span class="lineNum">     328 </span>            : 
+<span class="lineNum">     329 </span><span class="lineNoCov">          0 :       for (const auto&amp; __it : __classnames)</span>
+<span class="lineNum">     330 </span><span class="lineNoCov">          0 :         if (__s == __it.first)</span>
+<span class="lineNum">     331 </span>            :           {
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :             if (__icase</span>
+<span class="lineNum">     333 </span>            :                 &amp;&amp; ((__it.second
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :                      &amp; (ctype_base::lower | ctype_base::upper)) != 0))</span>
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 :               return ctype_base::alpha;</span>
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :             return __it.second;</span>
+<span class="lineNum">     337 </span>            :           }
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 :       return 0;</span>
+<span class="lineNum">     339 </span>            :     }
+<span class="lineNum">     340 </span>            : 
+<a name="341"><span class="lineNum">     341 </span>            :   template&lt;typename _Ch_type&gt;</a>
+<span class="lineNum">     342 </span>            :     bool
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :     regex_traits&lt;_Ch_type&gt;::</span>
+<span class="lineNum">     344 </span>            :     isctype(_Ch_type __c, char_class_type __f) const
+<span class="lineNum">     345 </span>            :     {
+<span class="lineNum">     346 </span>            :       typedef std::ctype&lt;char_type&gt; __ctype_type;
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 :       const __ctype_type&amp; __fctyp(use_facet&lt;__ctype_type&gt;(_M_locale));</span>
+<span class="lineNum">     348 </span>            : 
+<span class="lineNum">     349 </span>            :       return __fctyp.is(__f._M_base, __c)
+<span class="lineNum">     350 </span>            :         // [[:w:]]
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :         || ((__f._M_extended &amp; _RegexMask::_S_under)</span>
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :             &amp;&amp; __c == __fctyp.widen('_'));</span>
+<span class="lineNum">     353 </span>            :     }
+<span class="lineNum">     354 </span>            : 
+<a name="355"><span class="lineNum">     355 </span>            :   template&lt;typename _Ch_type&gt;</a>
+<span class="lineNum">     356 </span>            :     int
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :     regex_traits&lt;_Ch_type&gt;::</span>
+<span class="lineNum">     358 </span>            :     value(_Ch_type __ch, int __radix) const
+<span class="lineNum">     359 </span>            :     {
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :       std::basic_istringstream&lt;char_type&gt; __is(string_type(1, __ch));</span>
+<span class="lineNum">     361 </span>            :       long __v;
+<span class="lineNum">     362 </span><span class="lineNoCov">          0 :       if (__radix == 8)</span>
+<span class="lineNum">     363 </span><span class="lineNoCov">          0 :         __is &gt;&gt; std::oct;</span>
+<span class="lineNum">     364 </span><span class="lineNoCov">          0 :       else if (__radix == 16)</span>
+<span class="lineNum">     365 </span><span class="lineNoCov">          0 :         __is &gt;&gt; std::hex;</span>
+<span class="lineNum">     366 </span><span class="lineNoCov">          0 :       __is &gt;&gt; __v;</span>
+<span class="lineNum">     367 </span><span class="lineNoCov">          0 :       return __is.fail() ? -1 : __v;</span>
+<span class="lineNum">     368 </span>            :     }
+<span class="lineNum">     369 </span>            : 
+<span class="lineNum">     370 </span>            :   template&lt;typename _Bi_iter, typename _Alloc&gt;
+<span class="lineNum">     371 </span>            :   template&lt;typename _Out_iter&gt;
+<span class="lineNum">     372 </span>            :     _Out_iter match_results&lt;_Bi_iter, _Alloc&gt;::
+<span class="lineNum">     373 </span>            :     format(_Out_iter __out,
+<span class="lineNum">     374 </span>            :            const match_results&lt;_Bi_iter, _Alloc&gt;::char_type* __fmt_first,
+<span class="lineNum">     375 </span>            :            const match_results&lt;_Bi_iter, _Alloc&gt;::char_type* __fmt_last,
+<span class="lineNum">     376 </span>            :            match_flag_type __flags) const
+<span class="lineNum">     377 </span>            :     {
+<span class="lineNum">     378 </span>            :       _GLIBCXX_DEBUG_ASSERT( ready() );
+<span class="lineNum">     379 </span>            :       regex_traits&lt;char_type&gt; __traits;
+<span class="lineNum">     380 </span>            :       typedef std::ctype&lt;char_type&gt; __ctype_type;
+<span class="lineNum">     381 </span>            :       const __ctype_type&amp;
+<span class="lineNum">     382 </span>            :         __fctyp(use_facet&lt;__ctype_type&gt;(__traits.getloc()));
+<span class="lineNum">     383 </span>            : 
+<span class="lineNum">     384 </span>            :       auto __output = [&amp;](size_t __idx)
+<span class="lineNum">     385 </span>            :         {
+<span class="lineNum">     386 </span>            :           auto&amp; __sub = (*this)[__idx];
+<span class="lineNum">     387 </span>            :           if (__sub.matched)
+<span class="lineNum">     388 </span>            :             __out = std::copy(__sub.first, __sub.second, __out);
+<span class="lineNum">     389 </span>            :         };
+<span class="lineNum">     390 </span>            : 
+<span class="lineNum">     391 </span>            :       if (__flags &amp; regex_constants::format_sed)
+<span class="lineNum">     392 </span>            :         {
+<span class="lineNum">     393 </span>            :           for (; __fmt_first != __fmt_last;)
+<span class="lineNum">     394 </span>            :             if (*__fmt_first == '&amp;')
+<span class="lineNum">     395 </span>            :               {
+<span class="lineNum">     396 </span>            :                 __output(0);
+<span class="lineNum">     397 </span>            :                 ++__fmt_first;
+<span class="lineNum">     398 </span>            :               }
+<span class="lineNum">     399 </span>            :             else if (*__fmt_first == '\\')
+<span class="lineNum">     400 </span>            :               {
+<span class="lineNum">     401 </span>            :                 if (++__fmt_first != __fmt_last
+<span class="lineNum">     402 </span>            :                     &amp;&amp; __fctyp.is(__ctype_type::digit, *__fmt_first))
+<span class="lineNum">     403 </span>            :                   __output(__traits.value(*__fmt_first++, 10));
+<span class="lineNum">     404 </span>            :                 else
+<span class="lineNum">     405 </span>            :                   *__out++ = '\\';
+<span class="lineNum">     406 </span>            :               }
+<span class="lineNum">     407 </span>            :             else
+<span class="lineNum">     408 </span>            :               *__out++ = *__fmt_first++;
+<span class="lineNum">     409 </span>            :         }
+<span class="lineNum">     410 </span>            :       else
+<span class="lineNum">     411 </span>            :         {
+<span class="lineNum">     412 </span>            :           while (1)
+<span class="lineNum">     413 </span>            :             {
+<span class="lineNum">     414 </span>            :               auto __next = std::find(__fmt_first, __fmt_last, '$');
+<span class="lineNum">     415 </span>            :               if (__next == __fmt_last)
+<span class="lineNum">     416 </span>            :                 break;
+<span class="lineNum">     417 </span>            : 
+<span class="lineNum">     418 </span>            :               __out = std::copy(__fmt_first, __next, __out);
+<span class="lineNum">     419 </span>            : 
+<span class="lineNum">     420 </span>            :               auto __eat = [&amp;](char __ch) -&gt; bool
+<span class="lineNum">     421 </span>            :                 {
+<span class="lineNum">     422 </span>            :                   if (*__next == __ch)
+<span class="lineNum">     423 </span>            :                     {
+<span class="lineNum">     424 </span>            :                       ++__next;
+<span class="lineNum">     425 </span>            :                       return true;
+<span class="lineNum">     426 </span>            :                     }
+<span class="lineNum">     427 </span>            :                   return false;
+<span class="lineNum">     428 </span>            :                 };
+<span class="lineNum">     429 </span>            : 
+<span class="lineNum">     430 </span>            :               if (++__next == __fmt_last)
+<span class="lineNum">     431 </span>            :                 *__out++ = '$';
+<span class="lineNum">     432 </span>            :               else if (__eat('$'))
+<span class="lineNum">     433 </span>            :                 *__out++ = '$';
+<span class="lineNum">     434 </span>            :               else if (__eat('&amp;'))
+<span class="lineNum">     435 </span>            :                 __output(0);
+<span class="lineNum">     436 </span>            :               else if (__eat('`'))
+<span class="lineNum">     437 </span>            :                 {
+<span class="lineNum">     438 </span>            :                   auto&amp; __sub = _M_prefix();
+<span class="lineNum">     439 </span>            :                   if (__sub.matched)
+<span class="lineNum">     440 </span>            :                     __out = std::copy(__sub.first, __sub.second, __out);
+<span class="lineNum">     441 </span>            :                 }
+<span class="lineNum">     442 </span>            :               else if (__eat('\''))
+<span class="lineNum">     443 </span>            :                 {
+<span class="lineNum">     444 </span>            :                   auto&amp; __sub = _M_suffix();
+<span class="lineNum">     445 </span>            :                   if (__sub.matched)
+<span class="lineNum">     446 </span>            :                     __out = std::copy(__sub.first, __sub.second, __out);
+<span class="lineNum">     447 </span>            :                 }
+<span class="lineNum">     448 </span>            :               else if (__fctyp.is(__ctype_type::digit, *__next))
+<span class="lineNum">     449 </span>            :                 {
+<span class="lineNum">     450 </span>            :                   long __num = __traits.value(*__next, 10);
+<span class="lineNum">     451 </span>            :                   if (++__next != __fmt_last
+<span class="lineNum">     452 </span>            :                       &amp;&amp; __fctyp.is(__ctype_type::digit, *__next))
+<span class="lineNum">     453 </span>            :                     {
+<span class="lineNum">     454 </span>            :                       __num *= 10;
+<span class="lineNum">     455 </span>            :                       __num += __traits.value(*__next++, 10);
+<span class="lineNum">     456 </span>            :                     }
+<span class="lineNum">     457 </span>            :                   if (0 &lt;= __num &amp;&amp; __num &lt; this-&gt;size())
+<span class="lineNum">     458 </span>            :                     __output(__num);
+<span class="lineNum">     459 </span>            :                 }
+<span class="lineNum">     460 </span>            :               else
+<span class="lineNum">     461 </span>            :                 *__out++ = '$';
+<span class="lineNum">     462 </span>            :               __fmt_first = __next;
+<span class="lineNum">     463 </span>            :             }
+<span class="lineNum">     464 </span>            :           __out = std::copy(__fmt_first, __fmt_last, __out);
+<span class="lineNum">     465 </span>            :         }
+<span class="lineNum">     466 </span>            :       return __out;
+<span class="lineNum">     467 </span>            :     }
+<span class="lineNum">     468 </span>            : 
+<span class="lineNum">     469 </span>            :   template&lt;typename _Out_iter, typename _Bi_iter,
+<span class="lineNum">     470 </span>            :            typename _Rx_traits, typename _Ch_type&gt;
+<span class="lineNum">     471 </span>            :     _Out_iter
+<span class="lineNum">     472 </span>            :     regex_replace(_Out_iter __out, _Bi_iter __first, _Bi_iter __last,
+<span class="lineNum">     473 </span>            :                   const basic_regex&lt;_Ch_type, _Rx_traits&gt;&amp; __e,
+<span class="lineNum">     474 </span>            :                   const _Ch_type* __fmt,
+<span class="lineNum">     475 </span>            :                   regex_constants::match_flag_type __flags)
+<span class="lineNum">     476 </span>            :     {
+<span class="lineNum">     477 </span>            :       typedef regex_iterator&lt;_Bi_iter, _Ch_type, _Rx_traits&gt; _IterT;
+<span class="lineNum">     478 </span>            :       _IterT __i(__first, __last, __e, __flags);
+<span class="lineNum">     479 </span>            :       _IterT __end;
+<span class="lineNum">     480 </span>            :       if (__i == __end)
+<span class="lineNum">     481 </span>            :         {
+<span class="lineNum">     482 </span>            :           if (!(__flags &amp; regex_constants::format_no_copy))
+<span class="lineNum">     483 </span>            :             __out = std::copy(__first, __last, __out);
+<span class="lineNum">     484 </span>            :         }
+<span class="lineNum">     485 </span>            :       else
+<span class="lineNum">     486 </span>            :         {
+<span class="lineNum">     487 </span>            :           sub_match&lt;_Bi_iter&gt; __last;
+<span class="lineNum">     488 </span>            :           auto __len = char_traits&lt;_Ch_type&gt;::length(__fmt);
+<span class="lineNum">     489 </span>            :           for (; __i != __end; ++__i)
+<span class="lineNum">     490 </span>            :             {
+<span class="lineNum">     491 </span>            :               if (!(__flags &amp; regex_constants::format_no_copy))
+<span class="lineNum">     492 </span>            :                 __out = std::copy(__i-&gt;prefix().first, __i-&gt;prefix().second,
+<span class="lineNum">     493 </span>            :                                   __out);
+<span class="lineNum">     494 </span>            :               __out = __i-&gt;format(__out, __fmt, __fmt + __len, __flags);
+<span class="lineNum">     495 </span>            :               __last = __i-&gt;suffix();
+<span class="lineNum">     496 </span>            :               if (__flags &amp; regex_constants::format_first_only)
+<span class="lineNum">     497 </span>            :                 break;
+<span class="lineNum">     498 </span>            :             }
+<span class="lineNum">     499 </span>            :           if (!(__flags &amp; regex_constants::format_no_copy))
+<span class="lineNum">     500 </span>            :             __out = std::copy(__last.first, __last.second, __out);
+<span class="lineNum">     501 </span>            :         }
+<span class="lineNum">     502 </span>            :       return __out;
+<span class="lineNum">     503 </span>            :     }
+<span class="lineNum">     504 </span>            : 
+<span class="lineNum">     505 </span>            :   template&lt;typename _Bi_iter,
+<span class="lineNum">     506 </span>            :            typename _Ch_type,
+<span class="lineNum">     507 </span>            :            typename _Rx_traits&gt;
+<span class="lineNum">     508 </span>            :     bool
+<span class="lineNum">     509 </span>            :     regex_iterator&lt;_Bi_iter, _Ch_type, _Rx_traits&gt;::
+<span class="lineNum">     510 </span>            :     operator==(const regex_iterator&amp; __rhs) const
+<span class="lineNum">     511 </span>            :     {
+<span class="lineNum">     512 </span>            :       return (_M_match.empty() &amp;&amp; __rhs._M_match.empty())
+<span class="lineNum">     513 </span>            :         || (_M_begin == __rhs._M_begin
+<span class="lineNum">     514 </span>            :             &amp;&amp; _M_end == __rhs._M_end
+<span class="lineNum">     515 </span>            :             &amp;&amp; _M_pregex == __rhs._M_pregex
+<span class="lineNum">     516 </span>            :             &amp;&amp; _M_flags == __rhs._M_flags
+<span class="lineNum">     517 </span>            :             &amp;&amp; _M_match[0] == __rhs._M_match[0]);
+<span class="lineNum">     518 </span>            :     }
+<span class="lineNum">     519 </span>            : 
+<span class="lineNum">     520 </span>            :   template&lt;typename _Bi_iter,
+<span class="lineNum">     521 </span>            :            typename _Ch_type,
+<span class="lineNum">     522 </span>            :            typename _Rx_traits&gt;
+<span class="lineNum">     523 </span>            :     regex_iterator&lt;_Bi_iter, _Ch_type, _Rx_traits&gt;&amp;
+<span class="lineNum">     524 </span>            :     regex_iterator&lt;_Bi_iter, _Ch_type, _Rx_traits&gt;::
+<span class="lineNum">     525 </span>            :     operator++()
+<span class="lineNum">     526 </span>            :     {
+<span class="lineNum">     527 </span>            :       // In all cases in which the call to regex_search returns true,
+<span class="lineNum">     528 </span>            :       // match.prefix().first shall be equal to the previous value of
+<span class="lineNum">     529 </span>            :       // match[0].second, and for each index i in the half-open range
+<span class="lineNum">     530 </span>            :       // [0, match.size()) for which match[i].matched is true,
+<span class="lineNum">     531 </span>            :       // match[i].position() shall return distance(begin, match[i].first).
+<span class="lineNum">     532 </span>            :       // [28.12.1.4.5]
+<span class="lineNum">     533 </span>            :       if (_M_match[0].matched)
+<span class="lineNum">     534 </span>            :         {
+<span class="lineNum">     535 </span>            :           auto __start = _M_match[0].second;
+<span class="lineNum">     536 </span>            :           auto __prefix_first = _M_match[0].second;
+<span class="lineNum">     537 </span>            :           if (_M_match[0].first == _M_match[0].second)
+<span class="lineNum">     538 </span>            :             {
+<span class="lineNum">     539 </span>            :               if (__start == _M_end)
+<span class="lineNum">     540 </span>            :                 {
+<span class="lineNum">     541 </span>            :                   _M_match = value_type();
+<span class="lineNum">     542 </span>            :                   return *this;
+<span class="lineNum">     543 </span>            :                 }
+<span class="lineNum">     544 </span>            :               else
+<span class="lineNum">     545 </span>            :                 {
+<span class="lineNum">     546 </span>            :                   if (regex_search(__start, _M_end, _M_match, *_M_pregex,
+<span class="lineNum">     547 </span>            :                                    _M_flags
+<span class="lineNum">     548 </span>            :                                    | regex_constants::match_not_null
+<span class="lineNum">     549 </span>            :                                    | regex_constants::match_continuous))
+<span class="lineNum">     550 </span>            :                     {
+<span class="lineNum">     551 </span>            :                       _GLIBCXX_DEBUG_ASSERT(_M_match[0].matched);
+<span class="lineNum">     552 </span>            :                       auto&amp; __prefix = _M_match._M_prefix();
+<span class="lineNum">     553 </span>            :                       __prefix.first = __prefix_first;
+<span class="lineNum">     554 </span>            :                       __prefix.matched = __prefix.first != __prefix.second;
+<span class="lineNum">     555 </span>            :                       // [28.12.1.4.5]
+<span class="lineNum">     556 </span>            :                       _M_match._M_begin = _M_begin;
+<span class="lineNum">     557 </span>            :                       return *this;
+<span class="lineNum">     558 </span>            :                     }
+<span class="lineNum">     559 </span>            :                   else
+<span class="lineNum">     560 </span>            :                     ++__start;
+<span class="lineNum">     561 </span>            :                 }
+<span class="lineNum">     562 </span>            :             }
+<span class="lineNum">     563 </span>            :           _M_flags |= regex_constants::match_prev_avail;
+<span class="lineNum">     564 </span>            :           if (regex_search(__start, _M_end, _M_match, *_M_pregex, _M_flags))
+<span class="lineNum">     565 </span>            :             {
+<span class="lineNum">     566 </span>            :               _GLIBCXX_DEBUG_ASSERT(_M_match[0].matched);
+<span class="lineNum">     567 </span>            :               auto&amp; __prefix = _M_match._M_prefix();
+<span class="lineNum">     568 </span>            :               __prefix.first = __prefix_first;
+<span class="lineNum">     569 </span>            :               __prefix.matched = __prefix.first != __prefix.second;
+<span class="lineNum">     570 </span>            :               // [28.12.1.4.5]
+<span class="lineNum">     571 </span>            :               _M_match._M_begin = _M_begin;
+<span class="lineNum">     572 </span>            :             }
+<span class="lineNum">     573 </span>            :           else
+<span class="lineNum">     574 </span>            :             _M_match = value_type();
+<span class="lineNum">     575 </span>            :         }
+<span class="lineNum">     576 </span>            :       return *this;
+<span class="lineNum">     577 </span>            :     }
+<span class="lineNum">     578 </span>            : 
+<span class="lineNum">     579 </span>            :   template&lt;typename _Bi_iter,
+<span class="lineNum">     580 </span>            :            typename _Ch_type,
+<span class="lineNum">     581 </span>            :            typename _Rx_traits&gt;
+<span class="lineNum">     582 </span>            :     regex_token_iterator&lt;_Bi_iter, _Ch_type, _Rx_traits&gt;&amp;
+<span class="lineNum">     583 </span>            :     regex_token_iterator&lt;_Bi_iter, _Ch_type, _Rx_traits&gt;::
+<span class="lineNum">     584 </span>            :     operator=(const regex_token_iterator&amp; __rhs)
+<span class="lineNum">     585 </span>            :     {
+<span class="lineNum">     586 </span>            :       _M_position = __rhs._M_position;
+<span class="lineNum">     587 </span>            :       _M_subs = __rhs._M_subs;
+<span class="lineNum">     588 </span>            :       _M_n = __rhs._M_n;
+<span class="lineNum">     589 </span>            :       _M_suffix = __rhs._M_suffix;
+<span class="lineNum">     590 </span>            :       _M_has_m1 = __rhs._M_has_m1;
+<span class="lineNum">     591 </span>            :       _M_normalize_result();
+<span class="lineNum">     592 </span>            :       return *this;
+<span class="lineNum">     593 </span>            :     }
+<span class="lineNum">     594 </span>            : 
+<span class="lineNum">     595 </span>            :   template&lt;typename _Bi_iter,
+<span class="lineNum">     596 </span>            :            typename _Ch_type,
+<span class="lineNum">     597 </span>            :            typename _Rx_traits&gt;
+<span class="lineNum">     598 </span>            :     bool
+<span class="lineNum">     599 </span>            :     regex_token_iterator&lt;_Bi_iter, _Ch_type, _Rx_traits&gt;::
+<span class="lineNum">     600 </span>            :     operator==(const regex_token_iterator&amp; __rhs) const
+<span class="lineNum">     601 </span>            :     {
+<span class="lineNum">     602 </span>            :       if (_M_end_of_seq() &amp;&amp; __rhs._M_end_of_seq())
+<span class="lineNum">     603 </span>            :         return true;
+<span class="lineNum">     604 </span>            :       if (_M_suffix.matched &amp;&amp; __rhs._M_suffix.matched
+<span class="lineNum">     605 </span>            :           &amp;&amp; _M_suffix == __rhs._M_suffix)
+<span class="lineNum">     606 </span>            :         return true;
+<span class="lineNum">     607 </span>            :       if (_M_end_of_seq() || _M_suffix.matched
+<span class="lineNum">     608 </span>            :           || __rhs._M_end_of_seq() || __rhs._M_suffix.matched)
+<span class="lineNum">     609 </span>            :         return false;
+<span class="lineNum">     610 </span>            :       return _M_position == __rhs._M_position
+<span class="lineNum">     611 </span>            :         &amp;&amp; _M_n == __rhs._M_n
+<span class="lineNum">     612 </span>            :         &amp;&amp; _M_subs == __rhs._M_subs;
+<span class="lineNum">     613 </span>            :     }
+<span class="lineNum">     614 </span>            : 
+<span class="lineNum">     615 </span>            :   template&lt;typename _Bi_iter,
+<span class="lineNum">     616 </span>            :            typename _Ch_type,
+<span class="lineNum">     617 </span>            :            typename _Rx_traits&gt;
+<span class="lineNum">     618 </span>            :     regex_token_iterator&lt;_Bi_iter, _Ch_type, _Rx_traits&gt;&amp;
+<span class="lineNum">     619 </span>            :     regex_token_iterator&lt;_Bi_iter, _Ch_type, _Rx_traits&gt;::
+<span class="lineNum">     620 </span>            :     operator++()
+<span class="lineNum">     621 </span>            :     {
+<span class="lineNum">     622 </span>            :       _Position __prev = _M_position;
+<span class="lineNum">     623 </span>            :       if (_M_suffix.matched)
+<span class="lineNum">     624 </span>            :         *this = regex_token_iterator();
+<span class="lineNum">     625 </span>            :       else if (_M_n + 1 &lt; _M_subs.size())
+<span class="lineNum">     626 </span>            :         {
+<span class="lineNum">     627 </span>            :           _M_n++;
+<span class="lineNum">     628 </span>            :           _M_result = &amp;_M_current_match();
+<span class="lineNum">     629 </span>            :         }
+<span class="lineNum">     630 </span>            :       else
+<span class="lineNum">     631 </span>            :         {
+<span class="lineNum">     632 </span>            :           _M_n = 0;
+<span class="lineNum">     633 </span>            :           ++_M_position;
+<span class="lineNum">     634 </span>            :           if (_M_position != _Position())
+<span class="lineNum">     635 </span>            :             _M_result = &amp;_M_current_match();
+<span class="lineNum">     636 </span>            :           else if (_M_has_m1 &amp;&amp; __prev-&gt;suffix().length() != 0)
+<span class="lineNum">     637 </span>            :             {
+<span class="lineNum">     638 </span>            :               _M_suffix.matched = true;
+<span class="lineNum">     639 </span>            :               _M_suffix.first = __prev-&gt;suffix().first;
+<span class="lineNum">     640 </span>            :               _M_suffix.second = __prev-&gt;suffix().second;
+<span class="lineNum">     641 </span>            :               _M_result = &amp;_M_suffix;
+<span class="lineNum">     642 </span>            :             }
+<span class="lineNum">     643 </span>            :           else
+<span class="lineNum">     644 </span>            :             *this = regex_token_iterator();
+<span class="lineNum">     645 </span>            :         }
+<span class="lineNum">     646 </span>            :       return *this;
+<span class="lineNum">     647 </span>            :     }
+<span class="lineNum">     648 </span>            : 
+<span class="lineNum">     649 </span>            :   template&lt;typename _Bi_iter,
+<span class="lineNum">     650 </span>            :            typename _Ch_type,
+<span class="lineNum">     651 </span>            :            typename _Rx_traits&gt;
+<span class="lineNum">     652 </span>            :     void
+<span class="lineNum">     653 </span>            :     regex_token_iterator&lt;_Bi_iter, _Ch_type, _Rx_traits&gt;::
+<span class="lineNum">     654 </span>            :     _M_init(_Bi_iter __a, _Bi_iter __b)
+<span class="lineNum">     655 </span>            :     {
+<span class="lineNum">     656 </span>            :       _M_has_m1 = false;
+<span class="lineNum">     657 </span>            :       for (auto __it : _M_subs)
+<span class="lineNum">     658 </span>            :         if (__it == -1)
+<span class="lineNum">     659 </span>            :           {
+<span class="lineNum">     660 </span>            :             _M_has_m1 = true;
+<span class="lineNum">     661 </span>            :             break;
+<span class="lineNum">     662 </span>            :           }
+<span class="lineNum">     663 </span>            :       if (_M_position != _Position())
+<span class="lineNum">     664 </span>            :         _M_result = &amp;_M_current_match();
+<span class="lineNum">     665 </span>            :       else if (_M_has_m1)
+<span class="lineNum">     666 </span>            :         {
+<span class="lineNum">     667 </span>            :           _M_suffix.matched = true;
+<span class="lineNum">     668 </span>            :           _M_suffix.first = __a;
+<span class="lineNum">     669 </span>            :           _M_suffix.second = __b;
+<span class="lineNum">     670 </span>            :           _M_result = &amp;_M_suffix;
+<span class="lineNum">     671 </span>            :         }
+<span class="lineNum">     672 </span>            :       else
+<span class="lineNum">     673 </span>            :         _M_result = nullptr;
+<span class="lineNum">     674 </span>            :     }
+<span class="lineNum">     675 </span>            : 
+<span class="lineNum">     676 </span>            : _GLIBCXX_END_NAMESPACE_VERSION
+<span class="lineNum">     677 </span>            : } // namespace
+<span class="lineNum">     678 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.12</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

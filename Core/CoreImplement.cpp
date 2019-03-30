@@ -98,7 +98,7 @@ int CoreImplement::gen_chain_char(std::vector<std::string> &words, std::vector<s
     }
 }
 
-int CoreImplement::all_chain_word(std::vector<std::string> &words, std::set<std::vector<std::string>> &result, int n, char head, char tail){
+int CoreImplement::all_chain_word(std::vector<std::string> &words, std::set<std::vector<std::string>> &result, int n, int& error_flag, char head, char tail){
     for(int i = 0;i < words.size();i++){
         transform(words[i].begin(),words[i].end(),words[i].begin(),::tolower);
     }
@@ -109,6 +109,7 @@ int CoreImplement::all_chain_word(std::vector<std::string> &words, std::set<std:
     else sWN::request4(words, n);
 
     result = sWN::result;
+    error_flag = sWN::error_flag;
     return result.size();
 }
 

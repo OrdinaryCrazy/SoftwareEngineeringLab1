@@ -14,7 +14,7 @@ $(TARGET): 	test.cpp\
 	@ gcov CoreImplement  >> gcov.line
 	@ lcov -b ./ -d ./ --gcov-tool /usr/bin/gcov -c -o CoreImplement.info >> lcov.line
 	@ genhtml -o gcovdir/ CoreImplement.info >> genhtml.line
-	@ google-chrome ./gcovdir/index.html >> chrome.line
+	@ firefox ./gcovdir/index.html >> chrome.line
 
 
 all: $(TARGET)

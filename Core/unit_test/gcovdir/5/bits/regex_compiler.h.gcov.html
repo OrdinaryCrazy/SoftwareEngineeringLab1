@@ -1,0 +1,595 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - CoreImplement.info - 5/bits/regex_compiler.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">5/bits</a> - regex_compiler.h<span style="font-size: 80%;"> (source / <a href="regex_compiler.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">CoreImplement.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">101</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-03-31 00:09:46</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">99</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : // class template regex -*- C++ -*-</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            : // Copyright (C) 2010-2015 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : // This file is part of the GNU ISO C++ Library.  This library is free
+<span class="lineNum">       6 </span>            : // software; you can redistribute it and/or modify it under the
+<span class="lineNum">       7 </span>            : // terms of the GNU General Public License as published by the
+<span class="lineNum">       8 </span>            : // Free Software Foundation; either version 3, or (at your option)
+<span class="lineNum">       9 </span>            : // any later version.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : // This library is distributed in the hope that it will be useful,
+<span class="lineNum">      12 </span>            : // but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      13 </span>            : // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      14 </span>            : // GNU General Public License for more details.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : // Under Section 7 of GPL version 3, you are granted additional
+<span class="lineNum">      17 </span>            : // permissions described in the GCC Runtime Library Exception, version
+<span class="lineNum">      18 </span>            : // 3.1, as published by the Free Software Foundation.
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : // You should have received a copy of the GNU General Public License and
+<span class="lineNum">      21 </span>            : // a copy of the GCC Runtime Library Exception along with this program;
+<span class="lineNum">      22 </span>            : // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+<span class="lineNum">      23 </span>            : // &lt;http://www.gnu.org/licenses/&gt;.
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : /**
+<span class="lineNum">      26 </span>            :  *  @file bits/regex_compiler.h
+<span class="lineNum">      27 </span>            :  *  This is an internal header file, included by other library headers.
+<span class="lineNum">      28 </span>            :  *  Do not attempt to use it directly. @headername{regex}
+<span class="lineNum">      29 </span>            :  */
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : namespace std _GLIBCXX_VISIBILITY(default)
+<span class="lineNum">      32 </span>            : {
+<span class="lineNum">      33 </span>            : namespace __detail
+<span class="lineNum">      34 </span>            : {
+<span class="lineNum">      35 </span>            : _GLIBCXX_BEGIN_NAMESPACE_VERSION
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            :   /**
+<span class="lineNum">      38 </span>            :    * @addtogroup regex-detail
+<span class="lineNum">      39 </span>            :    * @{
+<span class="lineNum">      40 </span>            :    */
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            :   template&lt;typename, bool, bool&gt;
+<span class="lineNum">      43 </span>            :     struct _BracketMatcher;
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            :   /**
+<span class="lineNum">      46 </span>            :    * @brief Builds an NFA from an input iterator range.
+<span class="lineNum">      47 </span>            :    *
+<span class="lineNum">      48 </span>            :    * The %_TraitsT type should fulfill requirements [28.3].
+<a name="49"><span class="lineNum">      49 </span>            :    */</a>
+<span class="lineNum">      50 </span>            :   template&lt;typename _TraitsT&gt;
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :     class _Compiler</span>
+<span class="lineNum">      52 </span>            :     {
+<span class="lineNum">      53 </span>            :     public:
+<span class="lineNum">      54 </span>            :       typedef typename _TraitsT::char_type        _CharT;
+<span class="lineNum">      55 </span>            :       typedef const _CharT*                       _IterT;
+<span class="lineNum">      56 </span>            :       typedef _NFA&lt;_TraitsT&gt;                        _RegexT;
+<span class="lineNum">      57 </span>            :       typedef regex_constants::syntax_option_type _FlagT;
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            :       _Compiler(_IterT __b, _IterT __e,
+<span class="lineNum">      60 </span>            :                 const typename _TraitsT::locale_type&amp; __traits, _FlagT __flags);
+<a name="61"><span class="lineNum">      61 </span>            : </a>
+<span class="lineNum">      62 </span>            :       shared_ptr&lt;const _RegexT&gt;
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :       _M_get_nfa()</span>
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :       { return std::move(_M_nfa); }</span>
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            :     private:
+<span class="lineNum">      67 </span>            :       typedef _Scanner&lt;_CharT&gt;               _ScannerT;
+<span class="lineNum">      68 </span>            :       typedef typename _TraitsT::string_type _StringT;
+<span class="lineNum">      69 </span>            :       typedef typename _ScannerT::_TokenT    _TokenT;
+<span class="lineNum">      70 </span>            :       typedef _StateSeq&lt;_TraitsT&gt;            _StateSeqT;
+<span class="lineNum">      71 </span>            :       typedef std::stack&lt;_StateSeqT&gt;         _StackT;
+<span class="lineNum">      72 </span>            :       typedef std::ctype&lt;_CharT&gt;             _CtypeT;
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :       // accepts a specific token or returns false.
+<span class="lineNum">      75 </span>            :       bool
+<span class="lineNum">      76 </span>            :       _M_match_token(_TokenT __token);
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span>            :       void
+<span class="lineNum">      79 </span>            :       _M_disjunction();
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            :       void
+<span class="lineNum">      82 </span>            :       _M_alternative();
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            :       bool
+<span class="lineNum">      85 </span>            :       _M_term();
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            :       bool
+<span class="lineNum">      88 </span>            :       _M_assertion();
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            :       bool
+<span class="lineNum">      91 </span>            :       _M_quantifier();
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            :       bool
+<span class="lineNum">      94 </span>            :       _M_atom();
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            :       bool
+<span class="lineNum">      97 </span>            :       _M_bracket_expression();
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span>            :       template&lt;bool __icase, bool __collate&gt;
+<span class="lineNum">     100 </span>            :         void
+<span class="lineNum">     101 </span>            :         _M_insert_any_matcher_ecma();
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            :       template&lt;bool __icase, bool __collate&gt;
+<span class="lineNum">     104 </span>            :         void
+<span class="lineNum">     105 </span>            :         _M_insert_any_matcher_posix();
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            :       template&lt;bool __icase, bool __collate&gt;
+<span class="lineNum">     108 </span>            :         void
+<span class="lineNum">     109 </span>            :         _M_insert_char_matcher();
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            :       template&lt;bool __icase, bool __collate&gt;
+<span class="lineNum">     112 </span>            :         void
+<span class="lineNum">     113 </span>            :         _M_insert_character_class_matcher();
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span>            :       template&lt;bool __icase, bool __collate&gt;
+<span class="lineNum">     116 </span>            :         void
+<span class="lineNum">     117 </span>            :         _M_insert_bracket_matcher(bool __neg);
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            :       // Returns true if successfully matched one term and should continue.
+<span class="lineNum">     120 </span>            :       // Returns false if the compiler should move on.
+<span class="lineNum">     121 </span>            :       template&lt;bool __icase, bool __collate&gt;
+<span class="lineNum">     122 </span>            :         bool
+<span class="lineNum">     123 </span>            :         _M_expression_term(pair&lt;bool, _CharT&gt;&amp; __last_char,
+<span class="lineNum">     124 </span>            :                            _BracketMatcher&lt;_TraitsT, __icase, __collate&gt;&amp;
+<span class="lineNum">     125 </span>            :                            __matcher);
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span>            :       int
+<span class="lineNum">     128 </span>            :       _M_cur_int_value(int __radix);
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span>            :       bool
+<span class="lineNum">     131 </span>            :       _M_try_char();
+<a name="132"><span class="lineNum">     132 </span>            : </a>
+<span class="lineNum">     133 </span>            :       _StateSeqT
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :       _M_pop()</span>
+<span class="lineNum">     135 </span>            :       {
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :         auto ret = _M_stack.top();</span>
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :         _M_stack.pop();</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :         return ret;</span>
+<span class="lineNum">     139 </span>            :       }
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            :       _FlagT              _M_flags;
+<span class="lineNum">     142 </span>            :       _ScannerT           _M_scanner;
+<span class="lineNum">     143 </span>            :       shared_ptr&lt;_RegexT&gt; _M_nfa;
+<span class="lineNum">     144 </span>            :       _StringT            _M_value;
+<span class="lineNum">     145 </span>            :       _StackT             _M_stack;
+<span class="lineNum">     146 </span>            :       const _TraitsT&amp;     _M_traits;
+<span class="lineNum">     147 </span>            :       const _CtypeT&amp;      _M_ctype;
+<span class="lineNum">     148 </span>            :     };
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span>            :   template&lt;typename _Tp&gt;
+<span class="lineNum">     151 </span>            :     struct __has_contiguous_iter : std::false_type { };
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span>            :   template&lt;typename _Ch, typename _Tr, typename _Alloc&gt;
+<span class="lineNum">     154 </span>            :     struct __has_contiguous_iter&lt;std::basic_string&lt;_Ch, _Tr, _Alloc&gt;&gt;
+<span class="lineNum">     155 </span>            :     : std::true_type
+<span class="lineNum">     156 </span>            :     { };
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span>            :   template&lt;typename _Tp, typename _Alloc&gt;
+<span class="lineNum">     159 </span>            :     struct __has_contiguous_iter&lt;std::vector&lt;_Tp, _Alloc&gt;&gt;
+<span class="lineNum">     160 </span>            :     : std::true_type
+<span class="lineNum">     161 </span>            :     { };
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span>            :   template&lt;typename _Tp&gt;
+<span class="lineNum">     164 </span>            :     struct __is_contiguous_normal_iter : std::false_type { };
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            :   template&lt;typename _CharT&gt;
+<span class="lineNum">     167 </span>            :     struct __is_contiguous_normal_iter&lt;_CharT*&gt; : std::true_type { };
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :   template&lt;typename _Tp, typename _Cont&gt;
+<span class="lineNum">     170 </span>            :     struct
+<span class="lineNum">     171 </span>            :     __is_contiguous_normal_iter&lt;__gnu_cxx::__normal_iterator&lt;_Tp, _Cont&gt;&gt;
+<span class="lineNum">     172 </span>            :     : __has_contiguous_iter&lt;_Cont&gt;::type
+<span class="lineNum">     173 </span>            :     { };
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            :   template&lt;typename _Iter, typename _TraitsT&gt;
+<span class="lineNum">     176 </span>            :     using __enable_if_contiguous_normal_iter
+<span class="lineNum">     177 </span>            :       = typename enable_if&lt; __is_contiguous_normal_iter&lt;_Iter&gt;::value,
+<span class="lineNum">     178 </span>            :                            std::shared_ptr&lt;const _NFA&lt;_TraitsT&gt;&gt; &gt;::type;
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span>            :   template&lt;typename _Iter, typename _TraitsT&gt;
+<span class="lineNum">     181 </span>            :     using __disable_if_contiguous_normal_iter
+<span class="lineNum">     182 </span>            :       = typename enable_if&lt; !__is_contiguous_normal_iter&lt;_Iter&gt;::value,
+<span class="lineNum">     183 </span>            :                            std::shared_ptr&lt;const _NFA&lt;_TraitsT&gt;&gt; &gt;::type;
+<span class="lineNum">     184 </span>            : 
+<a name="185"><span class="lineNum">     185 </span>            :   template&lt;typename _FwdIter, typename _TraitsT&gt;</a>
+<span class="lineNum">     186 </span>            :     inline __enable_if_contiguous_normal_iter&lt;_FwdIter, _TraitsT&gt;
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :     __compile_nfa(_FwdIter __first, _FwdIter __last,</span>
+<span class="lineNum">     188 </span>            :                   const typename _TraitsT::locale_type&amp; __loc,
+<span class="lineNum">     189 </span>            :                   regex_constants::syntax_option_type __flags)
+<span class="lineNum">     190 </span>            :     {
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :       size_t __len = __last - __first;</span>
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :       const auto* __cfirst = __len ? std::__addressof(*__first) : nullptr;</span>
+<span class="lineNum">     193 </span>            :       using _Cmplr = _Compiler&lt;_TraitsT&gt;;
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :       return _Cmplr(__cfirst, __cfirst + __len, __loc, __flags)._M_get_nfa();</span>
+<span class="lineNum">     195 </span>            :     }
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span>            :   template&lt;typename _FwdIter, typename _TraitsT&gt;
+<span class="lineNum">     198 </span>            :     inline __disable_if_contiguous_normal_iter&lt;_FwdIter, _TraitsT&gt;
+<span class="lineNum">     199 </span>            :     __compile_nfa(_FwdIter __first, _FwdIter __last,
+<span class="lineNum">     200 </span>            :                   const typename _TraitsT::locale_type&amp; __loc,
+<span class="lineNum">     201 </span>            :                   regex_constants::syntax_option_type __flags)
+<span class="lineNum">     202 </span>            :     {
+<span class="lineNum">     203 </span>            :       basic_string&lt;typename _TraitsT::char_type&gt; __str(__first, __last);
+<span class="lineNum">     204 </span>            :       return __compile_nfa(__str.data(), __str.data() + __str.size(), __loc,
+<span class="lineNum">     205 </span>            :           __flags);
+<span class="lineNum">     206 </span>            :     }
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span>            :   // [28.13.14]
+<span class="lineNum">     209 </span>            :   template&lt;typename _TraitsT, bool __icase, bool __collate&gt;
+<span class="lineNum">     210 </span>            :     class _RegexTranslator
+<span class="lineNum">     211 </span>            :     {
+<span class="lineNum">     212 </span>            :     public:
+<span class="lineNum">     213 </span>            :       typedef typename _TraitsT::char_type            _CharT;
+<span class="lineNum">     214 </span>            :       typedef typename _TraitsT::string_type          _StringT;
+<span class="lineNum">     215 </span>            :       typedef typename std::conditional&lt;__collate,
+<span class="lineNum">     216 </span>            :                                         _StringT,
+<span class="lineNum">     217 </span>            :                                         _CharT&gt;::type _StrTransT;
+<a name="218"><span class="lineNum">     218 </span>            : </a>
+<span class="lineNum">     219 </span>            :       explicit
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :       _RegexTranslator(const _TraitsT&amp; __traits)</span>
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :       : _M_traits(__traits)</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :       { }</span>
+<a name="223"><span class="lineNum">     223 </span>            : </a>
+<span class="lineNum">     224 </span>            :       _CharT
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :       _M_translate(_CharT __ch) const</span>
+<span class="lineNum">     226 </span>            :       {
+<span class="lineNum">     227 </span>            :         if (__icase)
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :           return _M_traits.translate_nocase(__ch);</span>
+<span class="lineNum">     229 </span>            :         else if (__collate)
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :           return _M_traits.translate(__ch);</span>
+<span class="lineNum">     231 </span>            :         else
+<span class="lineNum">     232 </span>            :           return __ch;
+<span class="lineNum">     233 </span>            :       }
+<a name="234"><span class="lineNum">     234 </span>            : </a>
+<span class="lineNum">     235 </span>            :       _StrTransT
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :       _M_transform(_CharT __ch) const</span>
+<span class="lineNum">     237 </span>            :       {
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :         return _M_transform_impl(__ch, typename integral_constant&lt;bool,</span>
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :                                  __collate&gt;::type());</span>
+<span class="lineNum">     240 </span>            :       }
+<span class="lineNum">     241 </span>            : 
+<a name="242"><span class="lineNum">     242 </span>            :     private:</a>
+<span class="lineNum">     243 </span>            :       _StrTransT
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :       _M_transform_impl(_CharT __ch, false_type) const</span>
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :       { return __ch; }</span>
+<a name="246"><span class="lineNum">     246 </span>            : </a>
+<span class="lineNum">     247 </span>            :       _StrTransT
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 :       _M_transform_impl(_CharT __ch, true_type) const</span>
+<span class="lineNum">     249 </span>            :       {
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :         _StrTransT __str = _StrTransT(1, _M_translate(__ch));</span>
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :         return _M_traits.transform(__str.begin(), __str.end());</span>
+<span class="lineNum">     252 </span>            :       }
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span>            :       const _TraitsT&amp; _M_traits;
+<span class="lineNum">     255 </span>            :     };
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span>            :   template&lt;typename _TraitsT&gt;
+<span class="lineNum">     258 </span>            :     class _RegexTranslator&lt;_TraitsT, false, false&gt;
+<span class="lineNum">     259 </span>            :     {
+<span class="lineNum">     260 </span>            :     public:
+<span class="lineNum">     261 </span>            :       typedef typename _TraitsT::char_type _CharT;
+<span class="lineNum">     262 </span>            :       typedef _CharT                       _StrTransT;
+<a name="263"><span class="lineNum">     263 </span>            : </a>
+<span class="lineNum">     264 </span>            :       explicit
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :       _RegexTranslator(const _TraitsT&amp;)</span>
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :       { }</span>
+<a name="267"><span class="lineNum">     267 </span>            : </a>
+<span class="lineNum">     268 </span>            :       _CharT
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :       _M_translate(_CharT __ch) const</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :       { return __ch; }</span>
+<a name="271"><span class="lineNum">     271 </span>            : </a>
+<span class="lineNum">     272 </span>            :       _StrTransT
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :       _M_transform(_CharT __ch) const</span>
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :       { return __ch; }</span>
+<span class="lineNum">     275 </span>            :     };
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span>            :   template&lt;typename _TraitsT, bool __is_ecma, bool __icase, bool __collate&gt;
+<span class="lineNum">     278 </span>            :     struct _AnyMatcher;
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span>            :   template&lt;typename _TraitsT, bool __icase, bool __collate&gt;
+<span class="lineNum">     281 </span>            :     struct _AnyMatcher&lt;_TraitsT, false, __icase, __collate&gt;
+<span class="lineNum">     282 </span>            :     {
+<span class="lineNum">     283 </span>            :       typedef _RegexTranslator&lt;_TraitsT, __icase, __collate&gt; _TransT;
+<span class="lineNum">     284 </span>            :       typedef typename _TransT::_CharT                       _CharT;
+<a name="285"><span class="lineNum">     285 </span>            : </a>
+<span class="lineNum">     286 </span>            :       explicit
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :       _AnyMatcher(const _TraitsT&amp; __traits)</span>
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :       : _M_translator(__traits)</span>
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :       { }</span>
+<a name="290"><span class="lineNum">     290 </span>            : </a>
+<span class="lineNum">     291 </span>            :       bool
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :       operator()(_CharT __ch) const</span>
+<span class="lineNum">     293 </span>            :       {
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :         static auto __nul = _M_translator._M_translate('\0');</span>
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :         return _M_translator._M_translate(__ch) != __nul;</span>
+<span class="lineNum">     296 </span>            :       }
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span>            :       _TransT _M_translator;
+<span class="lineNum">     299 </span>            :     };
+<span class="lineNum">     300 </span>            : 
+<span class="lineNum">     301 </span>            :   template&lt;typename _TraitsT, bool __icase, bool __collate&gt;
+<span class="lineNum">     302 </span>            :     struct _AnyMatcher&lt;_TraitsT, true, __icase, __collate&gt;
+<span class="lineNum">     303 </span>            :     {
+<span class="lineNum">     304 </span>            :       typedef _RegexTranslator&lt;_TraitsT, __icase, __collate&gt; _TransT;
+<span class="lineNum">     305 </span>            :       typedef typename _TransT::_CharT                       _CharT;
+<a name="306"><span class="lineNum">     306 </span>            : </a>
+<span class="lineNum">     307 </span>            :       explicit
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :       _AnyMatcher(const _TraitsT&amp; __traits)</span>
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :       : _M_translator(__traits)</span>
+<span class="lineNum">     310 </span><span class="lineNoCov">          0 :       { }</span>
+<a name="311"><span class="lineNum">     311 </span>            : </a>
+<span class="lineNum">     312 </span>            :       bool
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :       operator()(_CharT __ch) const</span>
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :       { return _M_apply(__ch, typename is_same&lt;_CharT, char&gt;::type()); }</span>
+<a name="315"><span class="lineNum">     315 </span>            : </a>
+<span class="lineNum">     316 </span>            :       bool
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :       _M_apply(_CharT __ch, true_type) const</span>
+<span class="lineNum">     318 </span>            :       {
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :         auto __c = _M_translator._M_translate(__ch);</span>
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :         auto __n = _M_translator._M_translate('\n');</span>
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :         auto __r = _M_translator._M_translate('\r');</span>
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :         return __c != __n &amp;&amp; __c != __r;</span>
+<span class="lineNum">     323 </span>            :       }
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span>            :       bool
+<span class="lineNum">     326 </span>            :       _M_apply(_CharT __ch, false_type) const
+<span class="lineNum">     327 </span>            :       {
+<span class="lineNum">     328 </span>            :         auto __c = _M_translator._M_translate(__ch);
+<span class="lineNum">     329 </span>            :         auto __n = _M_translator._M_translate('\n');
+<span class="lineNum">     330 </span>            :         auto __r = _M_translator._M_translate('\r');
+<span class="lineNum">     331 </span>            :         auto __u2028 = _M_translator._M_translate(u'\u2028');
+<span class="lineNum">     332 </span>            :         auto __u2029 = _M_translator._M_translate(u'\u2029');
+<span class="lineNum">     333 </span>            :         return __c != __n &amp;&amp; __c != __r &amp;&amp; __c != __u2028 &amp;&amp; __c != __u2029;
+<span class="lineNum">     334 </span>            :       }
+<span class="lineNum">     335 </span>            : 
+<span class="lineNum">     336 </span>            :       _TransT _M_translator;
+<span class="lineNum">     337 </span>            :     };
+<span class="lineNum">     338 </span>            : 
+<span class="lineNum">     339 </span>            :   template&lt;typename _TraitsT, bool __icase, bool __collate&gt;
+<span class="lineNum">     340 </span>            :     struct _CharMatcher
+<span class="lineNum">     341 </span>            :     {
+<span class="lineNum">     342 </span>            :       typedef _RegexTranslator&lt;_TraitsT, __icase, __collate&gt; _TransT;
+<a name="343"><span class="lineNum">     343 </span>            :       typedef typename _TransT::_CharT                       _CharT;</a>
+<span class="lineNum">     344 </span>            : 
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :       _CharMatcher(_CharT __ch, const _TraitsT&amp; __traits)</span>
+<span class="lineNum">     346 </span><span class="lineNoCov">          0 :       : _M_translator(__traits), _M_ch(_M_translator._M_translate(__ch))</span>
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 :       { }</span>
+<a name="348"><span class="lineNum">     348 </span>            : </a>
+<span class="lineNum">     349 </span>            :       bool
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :       operator()(_CharT __ch) const</span>
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :       { return _M_ch == _M_translator._M_translate(__ch); }</span>
+<span class="lineNum">     352 </span>            : 
+<span class="lineNum">     353 </span>            :       _TransT _M_translator;
+<span class="lineNum">     354 </span>            :       _CharT  _M_ch;
+<span class="lineNum">     355 </span>            :     };
+<span class="lineNum">     356 </span>            : 
+<a name="357"><span class="lineNum">     357 </span>            :   /// Matches a character range (bracket expression)</a>
+<span class="lineNum">     358 </span>            :   template&lt;typename _TraitsT, bool __icase, bool __collate&gt;
+<span class="lineNum">     359 </span><span class="lineNoCov">          0 :     struct _BracketMatcher</span>
+<span class="lineNum">     360 </span>            :     {
+<span class="lineNum">     361 </span>            :     public:
+<span class="lineNum">     362 </span>            :       typedef _RegexTranslator&lt;_TraitsT, __icase, __collate&gt; _TransT;
+<span class="lineNum">     363 </span>            :       typedef typename _TransT::_CharT                       _CharT;
+<span class="lineNum">     364 </span>            :       typedef typename _TransT::_StrTransT                   _StrTransT;
+<span class="lineNum">     365 </span>            :       typedef typename _TraitsT::string_type                 _StringT;
+<span class="lineNum">     366 </span>            :       typedef typename _TraitsT::char_class_type             _CharClassT;
+<a name="367"><span class="lineNum">     367 </span>            : </a>
+<span class="lineNum">     368 </span>            :     public:
+<span class="lineNum">     369 </span><span class="lineNoCov">          0 :       _BracketMatcher(bool __is_non_matching,</span>
+<span class="lineNum">     370 </span>            :                       const _TraitsT&amp; __traits)
+<span class="lineNum">     371 </span>            :       : _M_class_set(0), _M_translator(__traits), _M_traits(__traits),
+<span class="lineNum">     372 </span><span class="lineNoCov">          0 :       _M_is_non_matching(__is_non_matching)</span>
+<span class="lineNum">     373 </span>            : #ifdef _GLIBCXX_DEBUG
+<span class="lineNum">     374 </span>            :       , _M_is_ready(false)
+<span class="lineNum">     375 </span>            : #endif
+<span class="lineNum">     376 </span><span class="lineNoCov">          0 :       { }</span>
+<a name="377"><span class="lineNum">     377 </span>            : </a>
+<span class="lineNum">     378 </span>            :       bool
+<span class="lineNum">     379 </span><span class="lineNoCov">          0 :       operator()(_CharT __ch) const</span>
+<span class="lineNum">     380 </span>            :       {
+<span class="lineNum">     381 </span>            :         _GLIBCXX_DEBUG_ASSERT(_M_is_ready);
+<span class="lineNum">     382 </span><span class="lineNoCov">          0 :         return _M_apply(__ch, _UseCache());</span>
+<span class="lineNum">     383 </span>            :       }
+<a name="384"><span class="lineNum">     384 </span>            : </a>
+<span class="lineNum">     385 </span>            :       void
+<span class="lineNum">     386 </span><span class="lineNoCov">          0 :       _M_add_char(_CharT __c)</span>
+<span class="lineNum">     387 </span>            :       {
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :         _M_char_set.push_back(_M_translator._M_translate(__c));</span>
+<span class="lineNum">     389 </span>            : #ifdef _GLIBCXX_DEBUG
+<span class="lineNum">     390 </span>            :         _M_is_ready = false;
+<span class="lineNum">     391 </span>            : #endif
+<span class="lineNum">     392 </span><span class="lineNoCov">          0 :       }</span>
+<a name="393"><span class="lineNum">     393 </span>            : </a>
+<span class="lineNum">     394 </span>            :       _StringT
+<span class="lineNum">     395 </span><span class="lineNoCov">          0 :       _M_add_collate_element(const _StringT&amp; __s)</span>
+<span class="lineNum">     396 </span>            :       {
+<span class="lineNum">     397 </span>            :         auto __st = _M_traits.lookup_collatename(__s.data(),
+<span class="lineNum">     398 </span><span class="lineNoCov">          0 :                                                  __s.data() + __s.size());</span>
+<span class="lineNum">     399 </span><span class="lineNoCov">          0 :         if (__st.empty())</span>
+<span class="lineNum">     400 </span><span class="lineNoCov">          0 :           __throw_regex_error(regex_constants::error_collate);</span>
+<span class="lineNum">     401 </span><span class="lineNoCov">          0 :         _M_char_set.push_back(_M_translator._M_translate(__st[0]));</span>
+<span class="lineNum">     402 </span>            : #ifdef _GLIBCXX_DEBUG
+<span class="lineNum">     403 </span>            :         _M_is_ready = false;
+<span class="lineNum">     404 </span>            : #endif
+<span class="lineNum">     405 </span><span class="lineNoCov">          0 :         return __st;</span>
+<span class="lineNum">     406 </span>            :       }
+<a name="407"><span class="lineNum">     407 </span>            : </a>
+<span class="lineNum">     408 </span>            :       void
+<span class="lineNum">     409 </span><span class="lineNoCov">          0 :       _M_add_equivalence_class(const _StringT&amp; __s)</span>
+<span class="lineNum">     410 </span>            :       {
+<span class="lineNum">     411 </span>            :         auto __st = _M_traits.lookup_collatename(__s.data(),
+<span class="lineNum">     412 </span><span class="lineNoCov">          0 :                                                  __s.data() + __s.size());</span>
+<span class="lineNum">     413 </span><span class="lineNoCov">          0 :         if (__st.empty())</span>
+<span class="lineNum">     414 </span><span class="lineNoCov">          0 :           __throw_regex_error(regex_constants::error_collate);</span>
+<span class="lineNum">     415 </span><span class="lineNoCov">          0 :         __st = _M_traits.transform_primary(__st.data(),</span>
+<span class="lineNum">     416 </span><span class="lineNoCov">          0 :                                            __st.data() + __st.size());</span>
+<span class="lineNum">     417 </span><span class="lineNoCov">          0 :         _M_equiv_set.push_back(__st);</span>
+<span class="lineNum">     418 </span>            : #ifdef _GLIBCXX_DEBUG
+<span class="lineNum">     419 </span>            :         _M_is_ready = false;
+<span class="lineNum">     420 </span>            : #endif
+<span class="lineNum">     421 </span><span class="lineNoCov">          0 :       }</span>
+<span class="lineNum">     422 </span>            : 
+<a name="423"><span class="lineNum">     423 </span>            :       // __neg should be true for \D, \S and \W only.</a>
+<span class="lineNum">     424 </span>            :       void
+<span class="lineNum">     425 </span><span class="lineNoCov">          0 :       _M_add_character_class(const _StringT&amp; __s, bool __neg)</span>
+<span class="lineNum">     426 </span>            :       {
+<span class="lineNum">     427 </span>            :         auto __mask = _M_traits.lookup_classname(__s.data(),
+<span class="lineNum">     428 </span><span class="lineNoCov">          0 :                                                  __s.data() + __s.size(),</span>
+<span class="lineNum">     429 </span><span class="lineNoCov">          0 :                                                  __icase);</span>
+<span class="lineNum">     430 </span><span class="lineNoCov">          0 :         if (__mask == 0)</span>
+<span class="lineNum">     431 </span><span class="lineNoCov">          0 :           __throw_regex_error(regex_constants::error_ctype);</span>
+<span class="lineNum">     432 </span><span class="lineNoCov">          0 :         if (!__neg)</span>
+<span class="lineNum">     433 </span><span class="lineNoCov">          0 :           _M_class_set |= __mask;</span>
+<span class="lineNum">     434 </span>            :         else
+<span class="lineNum">     435 </span><span class="lineNoCov">          0 :           _M_neg_class_set.push_back(__mask);</span>
+<span class="lineNum">     436 </span>            : #ifdef _GLIBCXX_DEBUG
+<span class="lineNum">     437 </span>            :         _M_is_ready = false;
+<span class="lineNum">     438 </span>            : #endif
+<span class="lineNum">     439 </span><span class="lineNoCov">          0 :       }</span>
+<a name="440"><span class="lineNum">     440 </span>            : </a>
+<span class="lineNum">     441 </span>            :       void
+<span class="lineNum">     442 </span><span class="lineNoCov">          0 :       _M_make_range(_CharT __l, _CharT __r)</span>
+<span class="lineNum">     443 </span>            :       {
+<span class="lineNum">     444 </span><span class="lineNoCov">          0 :         if (__l &gt; __r)</span>
+<span class="lineNum">     445 </span><span class="lineNoCov">          0 :           __throw_regex_error(regex_constants::error_range);</span>
+<span class="lineNum">     446 </span><span class="lineNoCov">          0 :         _M_range_set.push_back(make_pair(_M_translator._M_transform(__l),</span>
+<span class="lineNum">     447 </span>            :                                          _M_translator._M_transform(__r)));
+<span class="lineNum">     448 </span>            : #ifdef _GLIBCXX_DEBUG
+<span class="lineNum">     449 </span>            :         _M_is_ready = false;
+<span class="lineNum">     450 </span>            : #endif
+<span class="lineNum">     451 </span><span class="lineNoCov">          0 :       }</span>
+<a name="452"><span class="lineNum">     452 </span>            : </a>
+<span class="lineNum">     453 </span>            :       void
+<span class="lineNum">     454 </span><span class="lineNoCov">          0 :       _M_ready()</span>
+<span class="lineNum">     455 </span>            :       {
+<span class="lineNum">     456 </span><span class="lineNoCov">          0 :         std::sort(_M_char_set.begin(), _M_char_set.end());</span>
+<span class="lineNum">     457 </span><span class="lineNoCov">          0 :         auto __end = std::unique(_M_char_set.begin(), _M_char_set.end());</span>
+<span class="lineNum">     458 </span><span class="lineNoCov">          0 :         _M_char_set.erase(__end, _M_char_set.end());</span>
+<span class="lineNum">     459 </span><span class="lineNoCov">          0 :         _M_make_cache(_UseCache());</span>
+<span class="lineNum">     460 </span>            : #ifdef _GLIBCXX_DEBUG
+<span class="lineNum">     461 </span>            :         _M_is_ready = true;
+<span class="lineNum">     462 </span>            : #endif
+<span class="lineNum">     463 </span><span class="lineNoCov">          0 :       }</span>
+<span class="lineNum">     464 </span>            : 
+<span class="lineNum">     465 </span>            :     private:
+<span class="lineNum">     466 </span>            :       // Currently we only use the cache for char
+<span class="lineNum">     467 </span>            :       typedef typename std::is_same&lt;_CharT, char&gt;::type _UseCache;
+<span class="lineNum">     468 </span>            : 
+<span class="lineNum">     469 </span>            :       static constexpr size_t
+<span class="lineNum">     470 </span>            :       _S_cache_size()
+<span class="lineNum">     471 </span>            :       {
+<span class="lineNum">     472 </span>            :         return 1ul &lt;&lt; (sizeof(_CharT) * __CHAR_BIT__ * int(_UseCache::value));
+<span class="lineNum">     473 </span>            :       }
+<span class="lineNum">     474 </span>            : 
+<span class="lineNum">     475 </span>            :       struct _Dummy { };
+<span class="lineNum">     476 </span>            :       typedef typename std::conditional&lt;_UseCache::value,
+<span class="lineNum">     477 </span>            :                                         std::bitset&lt;_S_cache_size()&gt;,
+<span class="lineNum">     478 </span>            :                                         _Dummy&gt;::type _CacheT;
+<span class="lineNum">     479 </span>            :       typedef typename std::make_unsigned&lt;_CharT&gt;::type _UnsignedCharT;
+<span class="lineNum">     480 </span>            : 
+<span class="lineNum">     481 </span>            :       bool
+<span class="lineNum">     482 </span>            :       _M_apply(_CharT __ch, false_type) const;
+<a name="483"><span class="lineNum">     483 </span>            : </a>
+<span class="lineNum">     484 </span>            :       bool
+<span class="lineNum">     485 </span><span class="lineNoCov">          0 :       _M_apply(_CharT __ch, true_type) const</span>
+<span class="lineNum">     486 </span><span class="lineNoCov">          0 :       { return _M_cache[static_cast&lt;_UnsignedCharT&gt;(__ch)]; }</span>
+<a name="487"><span class="lineNum">     487 </span>            : </a>
+<span class="lineNum">     488 </span>            :       void
+<span class="lineNum">     489 </span><span class="lineNoCov">          0 :       _M_make_cache(true_type)</span>
+<span class="lineNum">     490 </span>            :       {
+<span class="lineNum">     491 </span><span class="lineNoCov">          0 :         for (unsigned __i = 0; __i &lt; _M_cache.size(); __i++)</span>
+<span class="lineNum">     492 </span><span class="lineNoCov">          0 :           _M_cache[__i] = _M_apply(static_cast&lt;_CharT&gt;(__i), false_type());</span>
+<span class="lineNum">     493 </span><span class="lineNoCov">          0 :       }</span>
+<span class="lineNum">     494 </span>            : 
+<span class="lineNum">     495 </span>            :       void
+<span class="lineNum">     496 </span>            :       _M_make_cache(false_type)
+<span class="lineNum">     497 </span>            :       { }
+<span class="lineNum">     498 </span>            : 
+<span class="lineNum">     499 </span>            :     private:
+<span class="lineNum">     500 </span>            :       std::vector&lt;_CharT&gt;                       _M_char_set;
+<span class="lineNum">     501 </span>            :       std::vector&lt;_StringT&gt;                     _M_equiv_set;
+<span class="lineNum">     502 </span>            :       std::vector&lt;pair&lt;_StrTransT, _StrTransT&gt;&gt; _M_range_set;
+<span class="lineNum">     503 </span>            :       std::vector&lt;_CharClassT&gt;                  _M_neg_class_set;
+<span class="lineNum">     504 </span>            :       _CharClassT                               _M_class_set;
+<span class="lineNum">     505 </span>            :       _TransT                                   _M_translator;
+<span class="lineNum">     506 </span>            :       const _TraitsT&amp;                           _M_traits;
+<span class="lineNum">     507 </span>            :       bool                                      _M_is_non_matching;
+<span class="lineNum">     508 </span>            :       _CacheT                                   _M_cache;
+<span class="lineNum">     509 </span>            : #ifdef _GLIBCXX_DEBUG
+<span class="lineNum">     510 </span>            :       bool                                      _M_is_ready;
+<span class="lineNum">     511 </span>            : #endif
+<span class="lineNum">     512 </span>            :     };
+<span class="lineNum">     513 </span>            : 
+<span class="lineNum">     514 </span>            :  //@} regex-detail
+<span class="lineNum">     515 </span>            : _GLIBCXX_END_NAMESPACE_VERSION
+<span class="lineNum">     516 </span>            : } // namespace __detail
+<span class="lineNum">     517 </span>            : } // namespace std
+<span class="lineNum">     518 </span>            : 
+<span class="lineNum">     519 </span>            : #include &lt;bits/regex_compiler.tcc&gt;
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.12</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

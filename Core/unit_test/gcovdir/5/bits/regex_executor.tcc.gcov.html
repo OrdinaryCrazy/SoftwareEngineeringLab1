@@ -1,0 +1,515 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - CoreImplement.info - 5/bits/regex_executor.tcc</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">5/bits</a> - regex_executor.tcc<span style="font-size: 80%;"> (source / <a href="regex_executor.tcc.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">CoreImplement.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">166</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-03-31 00:09:46</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : // class template regex -*- C++ -*-</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            : // Copyright (C) 2013-2015 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : // This file is part of the GNU ISO C++ Library.  This library is free
+<span class="lineNum">       6 </span>            : // software; you can redistribute it and/or modify it under the
+<span class="lineNum">       7 </span>            : // terms of the GNU General Public License as published by the
+<span class="lineNum">       8 </span>            : // Free Software Foundation; either version 3, or (at your option)
+<span class="lineNum">       9 </span>            : // any later version.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : // This library is distributed in the hope that it will be useful,
+<span class="lineNum">      12 </span>            : // but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      13 </span>            : // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      14 </span>            : // GNU General Public License for more details.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : // Under Section 7 of GPL version 3, you are granted additional
+<span class="lineNum">      17 </span>            : // permissions described in the GCC Runtime Library Exception, version
+<span class="lineNum">      18 </span>            : // 3.1, as published by the Free Software Foundation.
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : // You should have received a copy of the GNU General Public License and
+<span class="lineNum">      21 </span>            : // a copy of the GCC Runtime Library Exception along with this program;
+<span class="lineNum">      22 </span>            : // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+<span class="lineNum">      23 </span>            : // &lt;http://www.gnu.org/licenses/&gt;.
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : /**
+<span class="lineNum">      26 </span>            :  *  @file bits/regex_executor.tcc
+<span class="lineNum">      27 </span>            :  *  This is an internal header file, included by other library headers.
+<span class="lineNum">      28 </span>            :  *  Do not attempt to use it directly. @headername{regex}
+<span class="lineNum">      29 </span>            :  */
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : namespace std _GLIBCXX_VISIBILITY(default)
+<span class="lineNum">      32 </span>            : {
+<span class="lineNum">      33 </span>            : namespace __detail
+<span class="lineNum">      34 </span>            : {
+<span class="lineNum">      35 </span>            : _GLIBCXX_BEGIN_NAMESPACE_VERSION
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            :   template&lt;typename _BiIter, typename _Alloc, typename _TraitsT,
+<span class="lineNum">      38 </span>            :            bool __dfs_mode&gt;
+<span class="lineNum">      39 </span>            :     bool _Executor&lt;_BiIter, _Alloc, _TraitsT, __dfs_mode&gt;::
+<span class="lineNum">      40 </span>            :     _M_search()
+<span class="lineNum">      41 </span>            :     {
+<span class="lineNum">      42 </span>            :       if (_M_search_from_first())
+<span class="lineNum">      43 </span>            :         return true;
+<span class="lineNum">      44 </span>            :       if (_M_flags &amp; regex_constants::match_continuous)
+<span class="lineNum">      45 </span>            :         return false;
+<span class="lineNum">      46 </span>            :       _M_flags |= regex_constants::match_prev_avail;
+<span class="lineNum">      47 </span>            :       while (_M_begin != _M_end)
+<span class="lineNum">      48 </span>            :         {
+<span class="lineNum">      49 </span>            :           ++_M_begin;
+<span class="lineNum">      50 </span>            :           if (_M_search_from_first())
+<span class="lineNum">      51 </span>            :             return true;
+<span class="lineNum">      52 </span>            :         }
+<span class="lineNum">      53 </span>            :       return false;
+<span class="lineNum">      54 </span>            :     }
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            :   // The _M_main function operates in different modes, DFS mode or BFS mode,
+<span class="lineNum">      57 </span>            :   // indicated by template parameter __dfs_mode, and dispatches to one of the
+<span class="lineNum">      58 </span>            :   // _M_main_dispatch overloads.
+<span class="lineNum">      59 </span>            :   //
+<span class="lineNum">      60 </span>            :   // ------------------------------------------------------------
+<span class="lineNum">      61 </span>            :   //
+<span class="lineNum">      62 </span>            :   // DFS mode:
+<span class="lineNum">      63 </span>            :   //
+<span class="lineNum">      64 </span>            :   // It applies a Depth-First-Search (aka backtracking) on given NFA and input
+<span class="lineNum">      65 </span>            :   // string.
+<span class="lineNum">      66 </span>            :   // At the very beginning the executor stands in the start state, then it
+<span class="lineNum">      67 </span>            :   // tries every possible state transition in current state recursively. Some
+<span class="lineNum">      68 </span>            :   // state transitions consume input string, say, a single-char-matcher or a
+<span class="lineNum">      69 </span>            :   // back-reference matcher; some don't, like assertion or other anchor nodes.
+<span class="lineNum">      70 </span>            :   // When the input is exhausted and/or the current state is an accepting
+<span class="lineNum">      71 </span>            :   // state, the whole executor returns true.
+<span class="lineNum">      72 </span>            :   //
+<span class="lineNum">      73 </span>            :   // TODO: This approach is exponentially slow for certain input.
+<span class="lineNum">      74 </span>            :   //       Try to compile the NFA to a DFA.
+<span class="lineNum">      75 </span>            :   //
+<span class="lineNum">      76 </span>            :   // Time complexity: \Omega(match_length), O(2^(_M_nfa.size()))
+<span class="lineNum">      77 </span>            :   // Space complexity: \theta(match_results.size() + match_length)
+<span class="lineNum">      78 </span>            :   //
+<a name="79"><span class="lineNum">      79 </span>            :   template&lt;typename _BiIter, typename _Alloc, typename _TraitsT,</a>
+<span class="lineNum">      80 </span>            :            bool __dfs_mode&gt;
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :     bool _Executor&lt;_BiIter, _Alloc, _TraitsT, __dfs_mode&gt;::</span>
+<span class="lineNum">      82 </span>            :     _M_main_dispatch(_Match_mode __match_mode, __dfs)
+<span class="lineNum">      83 </span>            :     {
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :       _M_has_sol = false;</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :       *_M_states._M_get_sol_pos() = _BiIter();</span>
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :       _M_cur_results = _M_results;</span>
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :       _M_dfs(__match_mode, _M_states._M_start);</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :       return _M_has_sol;</span>
+<span class="lineNum">      89 </span>            :     }
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :   // ------------------------------------------------------------
+<span class="lineNum">      92 </span>            :   //
+<span class="lineNum">      93 </span>            :   // BFS mode:
+<span class="lineNum">      94 </span>            :   //
+<span class="lineNum">      95 </span>            :   // Russ Cox's article (http://swtch.com/~rsc/regexp/regexp1.html)
+<span class="lineNum">      96 </span>            :   // explained this algorithm clearly.
+<span class="lineNum">      97 </span>            :   //
+<span class="lineNum">      98 </span>            :   // It first computes epsilon closure (states that can be achieved without
+<span class="lineNum">      99 </span>            :   // consuming characters) for every state that's still matching,
+<span class="lineNum">     100 </span>            :   // using the same DFS algorithm, but doesn't re-enter states (using
+<span class="lineNum">     101 </span>            :   // _M_states._M_visited to check), nor follow _S_opcode_match.
+<span class="lineNum">     102 </span>            :   //
+<span class="lineNum">     103 </span>            :   // Then apply DFS using every _S_opcode_match (in _M_states._M_match_queue)
+<span class="lineNum">     104 </span>            :   // as the start state.
+<span class="lineNum">     105 </span>            :   //
+<span class="lineNum">     106 </span>            :   // It significantly reduces potential duplicate states, so has a better
+<span class="lineNum">     107 </span>            :   // upper bound; but it requires more overhead.
+<span class="lineNum">     108 </span>            :   //
+<span class="lineNum">     109 </span>            :   // Time complexity: \Omega(match_length * match_results.size())
+<span class="lineNum">     110 </span>            :   //                  O(match_length * _M_nfa.size() * match_results.size())
+<span class="lineNum">     111 </span>            :   // Space complexity: \Omega(_M_nfa.size() + match_results.size())
+<span class="lineNum">     112 </span>            :   //                   O(_M_nfa.size() * match_results.size())
+<a name="113"><span class="lineNum">     113 </span>            :   template&lt;typename _BiIter, typename _Alloc, typename _TraitsT,</a>
+<span class="lineNum">     114 </span>            :            bool __dfs_mode&gt;
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :     bool _Executor&lt;_BiIter, _Alloc, _TraitsT, __dfs_mode&gt;::</span>
+<span class="lineNum">     116 </span>            :     _M_main_dispatch(_Match_mode __match_mode, __bfs)
+<span class="lineNum">     117 </span>            :     {
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :       _M_states._M_queue(_M_states._M_start, _M_results);</span>
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :       bool __ret = false;</span>
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :       while (1)</span>
+<span class="lineNum">     121 </span>            :         {
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :           _M_has_sol = false;</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :           if (_M_states._M_match_queue.empty())</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :           std::fill_n(_M_states._M_visited_states.get(), _M_nfa.size(), false);</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :           auto __old_queue = std::move(_M_states._M_match_queue);</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :           for (auto&amp; __task : __old_queue)</span>
+<span class="lineNum">     128 </span>            :             {
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :               _M_cur_results = std::move(__task.second);</span>
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :               _M_dfs(__match_mode, __task.first);</span>
+<span class="lineNum">     131 </span>            :             }
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :           if (__match_mode == _Match_mode::_Prefix)</span>
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :             __ret |= _M_has_sol;</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :           if (_M_current == _M_end)</span>
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :           ++_M_current;</span>
+<span class="lineNum">     137 </span>            :         }
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :       if (__match_mode == _Match_mode::_Exact)</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :         __ret = _M_has_sol;</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :       _M_states._M_match_queue.clear();</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :       return __ret;</span>
+<span class="lineNum">     142 </span>            :     }
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span>            :   // Return whether now match the given sub-NFA.
+<a name="145"><span class="lineNum">     145 </span>            :   template&lt;typename _BiIter, typename _Alloc, typename _TraitsT,</a>
+<span class="lineNum">     146 </span>            :            bool __dfs_mode&gt;
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :     bool _Executor&lt;_BiIter, _Alloc, _TraitsT, __dfs_mode&gt;::</span>
+<span class="lineNum">     148 </span>            :     _M_lookahead(_State&lt;_TraitsT&gt; __state)
+<span class="lineNum">     149 </span>            :     {
+<span class="lineNum">     150 </span>            :       // Backreferences may refer to captured content.
+<span class="lineNum">     151 </span>            :       // We may want to make this faster by not copying,
+<span class="lineNum">     152 </span>            :       // but let's not be clever prematurely.
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :       _ResultsVec __what(_M_cur_results);</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :       _Executor __sub(_M_current, _M_end, __what, _M_re, _M_flags);</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :       __sub._M_states._M_start = __state._M_alt;</span>
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :       if (__sub._M_search_from_first())</span>
+<span class="lineNum">     157 </span>            :         {
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :           for (size_t __i = 0; __i &lt; __what.size(); __i++)</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :             if (__what[__i].matched)</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :               _M_cur_results[__i] = __what[__i];</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :           return true;</span>
+<span class="lineNum">     162 </span>            :         }
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :       return false;</span>
+<span class="lineNum">     164 </span>            :     }
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            :   // __rep_count records how many times (__rep_count.second)
+<span class="lineNum">     167 </span>            :   // this node is visited under certain input iterator
+<span class="lineNum">     168 </span>            :   // (__rep_count.first). This prevent the executor from entering
+<span class="lineNum">     169 </span>            :   // infinite loop by refusing to continue when it's already been
+<span class="lineNum">     170 </span>            :   // visited more than twice. It's `twice` instead of `once` because
+<span class="lineNum">     171 </span>            :   // we need to spare one more time for potential group capture.
+<a name="172"><span class="lineNum">     172 </span>            :   template&lt;typename _BiIter, typename _Alloc, typename _TraitsT,</a>
+<span class="lineNum">     173 </span>            :     bool __dfs_mode&gt;
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :     void _Executor&lt;_BiIter, _Alloc, _TraitsT, __dfs_mode&gt;::</span>
+<span class="lineNum">     175 </span>            :     _M_rep_once_more(_Match_mode __match_mode, _StateIdT __i)
+<span class="lineNum">     176 </span>            :     {
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :       const auto&amp; __state = _M_nfa[__i];</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :       auto&amp; __rep_count = _M_rep_count[__i];</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :       if (__rep_count.second == 0 || __rep_count.first != _M_current)</span>
+<span class="lineNum">     180 </span>            :         {
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :           auto __back = __rep_count;</span>
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :           __rep_count.first = _M_current;</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :           __rep_count.second = 1;</span>
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :           _M_dfs(__match_mode, __state._M_alt);</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :           __rep_count = __back;</span>
+<span class="lineNum">     186 </span>            :         }
+<span class="lineNum">     187 </span>            :       else
+<span class="lineNum">     188 </span>            :         {
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :           if (__rep_count.second &lt; 2)</span>
+<span class="lineNum">     190 </span>            :             {
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :               __rep_count.second++;</span>
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :               _M_dfs(__match_mode, __state._M_alt);</span>
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :               __rep_count.second--;</span>
+<span class="lineNum">     194 </span>            :             }
+<span class="lineNum">     195 </span>            :         }
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :     };</span>
+<span class="lineNum">     197 </span>            : 
+<a name="198"><span class="lineNum">     198 </span>            :   template&lt;typename _BiIter, typename _Alloc, typename _TraitsT,</a>
+<span class="lineNum">     199 </span>            :            bool __dfs_mode&gt;
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :     void _Executor&lt;_BiIter, _Alloc, _TraitsT, __dfs_mode&gt;::</span>
+<span class="lineNum">     201 </span>            :     _M_dfs(_Match_mode __match_mode, _StateIdT __i)
+<span class="lineNum">     202 </span>            :     {
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :       if (_M_states._M_visited(__i))</span>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :         return;</span>
+<span class="lineNum">     205 </span>            : 
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :       const auto&amp; __state = _M_nfa[__i];</span>
+<span class="lineNum">     207 </span>            :       // Every change on _M_cur_results and _M_current will be rolled back after
+<span class="lineNum">     208 </span>            :       // finishing the recursion step.
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :       switch (__state._M_opcode)</span>
+<span class="lineNum">     210 </span>            :         {
+<span class="lineNum">     211 </span>            :         // _M_alt branch is &quot;match once more&quot;, while _M_next is &quot;get me out
+<span class="lineNum">     212 </span>            :         // of this quantifier&quot;. Executing _M_next first or _M_alt first don't
+<span class="lineNum">     213 </span>            :         // mean the same thing, and we need to choose the correct order under
+<span class="lineNum">     214 </span>            :         // given greedy mode.
+<span class="lineNum">     215 </span>            :         case _S_opcode_repeat:
+<span class="lineNum">     216 </span>            :           {
+<span class="lineNum">     217 </span>            :             // Greedy.
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :             if (!__state._M_neg)</span>
+<span class="lineNum">     219 </span>            :               {
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :                 _M_rep_once_more(__match_mode, __i);</span>
+<span class="lineNum">     221 </span>            :                 // If it's DFS executor and already accepted, we're done.
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :                 if (!__dfs_mode || !_M_has_sol)</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :                   _M_dfs(__match_mode, __state._M_next);</span>
+<span class="lineNum">     224 </span>            :               }
+<span class="lineNum">     225 </span>            :             else // Non-greedy mode
+<span class="lineNum">     226 </span>            :               {
+<span class="lineNum">     227 </span>            :                 if (__dfs_mode)
+<span class="lineNum">     228 </span>            :                   {
+<span class="lineNum">     229 </span>            :                     // vice-versa.
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :                     _M_dfs(__match_mode, __state._M_next);</span>
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :                     if (!_M_has_sol)</span>
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :                       _M_rep_once_more(__match_mode, __i);</span>
+<span class="lineNum">     233 </span>            :                   }
+<span class="lineNum">     234 </span>            :                 else
+<span class="lineNum">     235 </span>            :                   {
+<span class="lineNum">     236 </span>            :                     // DON'T attempt anything, because there's already another
+<span class="lineNum">     237 </span>            :                     // state with higher priority accepted. This state cannot
+<span class="lineNum">     238 </span>            :                     // be better by attempting its next node.
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :                     if (!_M_has_sol)</span>
+<span class="lineNum">     240 </span>            :                       {
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :                         _M_dfs(__match_mode, __state._M_next);</span>
+<span class="lineNum">     242 </span>            :                         // DON'T attempt anything if it's already accepted. An
+<span class="lineNum">     243 </span>            :                         // accepted state *must* be better than a solution that
+<span class="lineNum">     244 </span>            :                         // matches a non-greedy quantifier one more time.
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :                         if (!_M_has_sol)</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :                           _M_rep_once_more(__match_mode, __i);</span>
+<span class="lineNum">     247 </span>            :                       }
+<span class="lineNum">     248 </span>            :                   }
+<span class="lineNum">     249 </span>            :               }
+<span class="lineNum">     250 </span>            :             }
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     252 </span>            :         case _S_opcode_subexpr_begin:
+<span class="lineNum">     253 </span>            :           {
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :             auto&amp; __res = _M_cur_results[__state._M_subexpr];</span>
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :             auto __back = __res.first;</span>
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :             __res.first = _M_current;</span>
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 :             _M_dfs(__match_mode, __state._M_next);</span>
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :             __res.first = __back;</span>
+<span class="lineNum">     259 </span>            :           }
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     261 </span>            :         case _S_opcode_subexpr_end:
+<span class="lineNum">     262 </span>            :           {
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :             auto&amp; __res = _M_cur_results[__state._M_subexpr];</span>
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :             auto __back = __res;</span>
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :             __res.second = _M_current;</span>
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :             __res.matched = true;</span>
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :             _M_dfs(__match_mode, __state._M_next);</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :             __res = __back;</span>
+<span class="lineNum">     269 </span>            :           }
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     271 </span>            :         case _S_opcode_line_begin_assertion:
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :           if (_M_at_begin())</span>
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :             _M_dfs(__match_mode, __state._M_next);</span>
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     275 </span>            :         case _S_opcode_line_end_assertion:
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :           if (_M_at_end())</span>
+<span class="lineNum">     277 </span><span class="lineNoCov">          0 :             _M_dfs(__match_mode, __state._M_next);</span>
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     279 </span>            :         case _S_opcode_word_boundary:
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :           if (_M_word_boundary() == !__state._M_neg)</span>
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :             _M_dfs(__match_mode, __state._M_next);</span>
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     283 </span>            :         // Here __state._M_alt offers a single start node for a sub-NFA.
+<span class="lineNum">     284 </span>            :         // We recursively invoke our algorithm to match the sub-NFA.
+<span class="lineNum">     285 </span>            :         case _S_opcode_subexpr_lookahead:
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :           if (_M_lookahead(__state) == !__state._M_neg)</span>
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :             _M_dfs(__match_mode, __state._M_next);</span>
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     289 </span>            :         case _S_opcode_match:
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :           if (_M_current == _M_end)</span>
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     292 </span>            :           if (__dfs_mode)
+<span class="lineNum">     293 </span>            :             {
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :               if (__state._M_matches(*_M_current))</span>
+<span class="lineNum">     295 </span>            :                 {
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 :                   ++_M_current;</span>
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :                   _M_dfs(__match_mode, __state._M_next);</span>
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :                   --_M_current;</span>
+<span class="lineNum">     299 </span>            :                 }
+<span class="lineNum">     300 </span>            :             }
+<span class="lineNum">     301 </span>            :           else
+<span class="lineNum">     302 </span><span class="lineNoCov">          0 :             if (__state._M_matches(*_M_current))</span>
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :               _M_states._M_queue(__state._M_next, _M_cur_results);</span>
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     305 </span>            :         // First fetch the matched result from _M_cur_results as __submatch;
+<span class="lineNum">     306 </span>            :         // then compare it with
+<span class="lineNum">     307 </span>            :         // (_M_current, _M_current + (__submatch.second - __submatch.first)).
+<span class="lineNum">     308 </span>            :         // If matched, keep going; else just return and try another state.
+<span class="lineNum">     309 </span>            :         case _S_opcode_backref:
+<span class="lineNum">     310 </span>            :           {
+<span class="lineNum">     311 </span>            :             _GLIBCXX_DEBUG_ASSERT(__dfs_mode);
+<span class="lineNum">     312 </span><span class="lineNoCov">          0 :             auto&amp; __submatch = _M_cur_results[__state._M_backref_index];</span>
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :             if (!__submatch.matched)</span>
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :               break;</span>
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :             auto __last = _M_current;</span>
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :             for (auto __tmp = __submatch.first;</span>
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :                  __last != _M_end &amp;&amp; __tmp != __submatch.second;</span>
+<span class="lineNum">     318 </span>            :                  ++__tmp)
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :               ++__last;</span>
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :             if (_M_re._M_automaton-&gt;_M_traits.transform(__submatch.first,</span>
+<span class="lineNum">     321 </span>            :                                                         __submatch.second)
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :                 == _M_re._M_automaton-&gt;_M_traits.transform(_M_current, __last))</span>
+<span class="lineNum">     323 </span>            :               {
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :                 if (__last != _M_current)</span>
+<span class="lineNum">     325 </span>            :                   {
+<span class="lineNum">     326 </span><span class="lineNoCov">          0 :                     auto __backup = _M_current;</span>
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :                     _M_current = __last;</span>
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :                     _M_dfs(__match_mode, __state._M_next);</span>
+<span class="lineNum">     329 </span><span class="lineNoCov">          0 :                     _M_current = __backup;</span>
+<span class="lineNum">     330 </span>            :                   }
+<span class="lineNum">     331 </span>            :                 else
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :                   _M_dfs(__match_mode, __state._M_next);</span>
+<span class="lineNum">     333 </span>            :               }
+<span class="lineNum">     334 </span>            :           }
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     336 </span>            :         case _S_opcode_accept:
+<span class="lineNum">     337 </span>            :           if (__dfs_mode)
+<span class="lineNum">     338 </span>            :             {
+<span class="lineNum">     339 </span>            :               _GLIBCXX_DEBUG_ASSERT(!_M_has_sol);
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :               if (__match_mode == _Match_mode::_Exact)</span>
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :                 _M_has_sol = _M_current == _M_end;</span>
+<span class="lineNum">     342 </span>            :               else
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :                 _M_has_sol = true;</span>
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :               if (_M_current == _M_begin</span>
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :                   &amp;&amp; (_M_flags &amp; regex_constants::match_not_null))</span>
+<span class="lineNum">     346 </span><span class="lineNoCov">          0 :                 _M_has_sol = false;</span>
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 :               if (_M_has_sol)</span>
+<span class="lineNum">     348 </span>            :                 {
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :                   if (_M_nfa._M_flags &amp; regex_constants::ECMAScript)</span>
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :                     _M_results = _M_cur_results;</span>
+<span class="lineNum">     351 </span>            :                   else // POSIX
+<span class="lineNum">     352 </span>            :                     {
+<span class="lineNum">     353 </span>            :                       _GLIBCXX_DEBUG_ASSERT(_M_states._M_get_sol_pos());
+<span class="lineNum">     354 </span>            :                       // Here's POSIX's logic: match the longest one. However
+<span class="lineNum">     355 </span>            :                       // we never know which one (lhs or rhs of &quot;|&quot;) is longer
+<span class="lineNum">     356 </span>            :                       // unless we try both of them and compare the results.
+<span class="lineNum">     357 </span>            :                       // The member variable _M_sol_pos records the end
+<span class="lineNum">     358 </span>            :                       // position of the last successful match. It's better
+<span class="lineNum">     359 </span>            :                       // to be larger, because POSIX regex is always greedy.
+<span class="lineNum">     360 </span>            :                       // TODO: This could be slow.
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :                       if (*_M_states._M_get_sol_pos() == _BiIter()</span>
+<span class="lineNum">     362 </span><span class="lineNoCov">          0 :                           || std::distance(_M_begin,</span>
+<span class="lineNum">     363 </span><span class="lineNoCov">          0 :                                            *_M_states._M_get_sol_pos())</span>
+<span class="lineNum">     364 </span><span class="lineNoCov">          0 :                              &lt; std::distance(_M_begin, _M_current))</span>
+<span class="lineNum">     365 </span>            :                         {
+<span class="lineNum">     366 </span><span class="lineNoCov">          0 :                           *_M_states._M_get_sol_pos() = _M_current;</span>
+<span class="lineNum">     367 </span><span class="lineNoCov">          0 :                           _M_results = _M_cur_results;</span>
+<span class="lineNum">     368 </span>            :                         }
+<span class="lineNum">     369 </span>            :                     }
+<span class="lineNum">     370 </span>            :                 }
+<span class="lineNum">     371 </span>            :             }
+<span class="lineNum">     372 </span>            :           else
+<span class="lineNum">     373 </span>            :             {
+<span class="lineNum">     374 </span><span class="lineNoCov">          0 :               if (_M_current == _M_begin</span>
+<span class="lineNum">     375 </span><span class="lineNoCov">          0 :                   &amp;&amp; (_M_flags &amp; regex_constants::match_not_null))</span>
+<span class="lineNum">     376 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     377 </span><span class="lineNoCov">          0 :               if (__match_mode == _Match_mode::_Prefix || _M_current == _M_end)</span>
+<span class="lineNum">     378 </span><span class="lineNoCov">          0 :                 if (!_M_has_sol)</span>
+<span class="lineNum">     379 </span>            :                   {
+<span class="lineNum">     380 </span><span class="lineNoCov">          0 :                     _M_has_sol = true;</span>
+<span class="lineNum">     381 </span><span class="lineNoCov">          0 :                     _M_results = _M_cur_results;</span>
+<span class="lineNum">     382 </span>            :                   }
+<span class="lineNum">     383 </span>            :             }
+<span class="lineNum">     384 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     385 </span>            :         case _S_opcode_alternative:
+<span class="lineNum">     386 </span><span class="lineNoCov">          0 :           if (_M_nfa._M_flags &amp; regex_constants::ECMAScript)</span>
+<span class="lineNum">     387 </span>            :             {
+<span class="lineNum">     388 </span>            :               // TODO: Let BFS support ECMAScript's alternative operation.
+<span class="lineNum">     389 </span>            :               _GLIBCXX_DEBUG_ASSERT(__dfs_mode);
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :               _M_dfs(__match_mode, __state._M_alt);</span>
+<span class="lineNum">     391 </span>            :               // Pick lhs if it matches. Only try rhs if it doesn't.
+<span class="lineNum">     392 </span><span class="lineNoCov">          0 :               if (!_M_has_sol)</span>
+<span class="lineNum">     393 </span><span class="lineNoCov">          0 :                 _M_dfs(__match_mode, __state._M_next);</span>
+<span class="lineNum">     394 </span>            :             }
+<span class="lineNum">     395 </span>            :           else
+<span class="lineNum">     396 </span>            :             {
+<span class="lineNum">     397 </span>            :               // Try both and compare the result.
+<span class="lineNum">     398 </span>            :               // See &quot;case _S_opcode_accept:&quot; handling above.
+<span class="lineNum">     399 </span><span class="lineNoCov">          0 :               _M_dfs(__match_mode, __state._M_alt);</span>
+<span class="lineNum">     400 </span><span class="lineNoCov">          0 :               auto __has_sol = _M_has_sol;</span>
+<span class="lineNum">     401 </span><span class="lineNoCov">          0 :               _M_has_sol = false;</span>
+<span class="lineNum">     402 </span><span class="lineNoCov">          0 :               _M_dfs(__match_mode, __state._M_next);</span>
+<span class="lineNum">     403 </span><span class="lineNoCov">          0 :               _M_has_sol |= __has_sol;</span>
+<span class="lineNum">     404 </span>            :             }
+<span class="lineNum">     405 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     406 </span>            :         default:
+<span class="lineNum">     407 </span>            :           _GLIBCXX_DEBUG_ASSERT(false);
+<span class="lineNum">     408 </span>            :         }
+<span class="lineNum">     409 </span>            :     }
+<span class="lineNum">     410 </span>            : 
+<span class="lineNum">     411 </span>            :   // Return whether now is at some word boundary.
+<a name="412"><span class="lineNum">     412 </span>            :   template&lt;typename _BiIter, typename _Alloc, typename _TraitsT,</a>
+<span class="lineNum">     413 </span>            :            bool __dfs_mode&gt;
+<span class="lineNum">     414 </span><span class="lineNoCov">          0 :     bool _Executor&lt;_BiIter, _Alloc, _TraitsT, __dfs_mode&gt;::</span>
+<span class="lineNum">     415 </span>            :     _M_word_boundary() const
+<span class="lineNum">     416 </span>            :     {
+<span class="lineNum">     417 </span><span class="lineNoCov">          0 :       bool __left_is_word = false;</span>
+<span class="lineNum">     418 </span><span class="lineNoCov">          0 :       if (_M_current != _M_begin</span>
+<span class="lineNum">     419 </span><span class="lineNoCov">          0 :           || (_M_flags &amp; regex_constants::match_prev_avail))</span>
+<span class="lineNum">     420 </span>            :         {
+<span class="lineNum">     421 </span><span class="lineNoCov">          0 :           auto __prev = _M_current;</span>
+<span class="lineNum">     422 </span><span class="lineNoCov">          0 :           if (_M_is_word(*std::prev(__prev)))</span>
+<span class="lineNum">     423 </span><span class="lineNoCov">          0 :             __left_is_word = true;</span>
+<span class="lineNum">     424 </span>            :         }
+<span class="lineNum">     425 </span>            :       bool __right_is_word =
+<span class="lineNum">     426 </span><span class="lineNoCov">          0 :         _M_current != _M_end &amp;&amp; _M_is_word(*_M_current);</span>
+<span class="lineNum">     427 </span>            : 
+<span class="lineNum">     428 </span><span class="lineNoCov">          0 :       if (__left_is_word == __right_is_word)</span>
+<span class="lineNum">     429 </span><span class="lineNoCov">          0 :         return false;</span>
+<span class="lineNum">     430 </span><span class="lineNoCov">          0 :       if (__left_is_word &amp;&amp; !(_M_flags &amp; regex_constants::match_not_eow))</span>
+<span class="lineNum">     431 </span><span class="lineNoCov">          0 :         return true;</span>
+<span class="lineNum">     432 </span><span class="lineNoCov">          0 :       if (__right_is_word &amp;&amp; !(_M_flags &amp; regex_constants::match_not_bow))</span>
+<span class="lineNum">     433 </span><span class="lineNoCov">          0 :         return true;</span>
+<span class="lineNum">     434 </span><span class="lineNoCov">          0 :       return false;</span>
+<span class="lineNum">     435 </span>            :     }
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span>            : _GLIBCXX_END_NAMESPACE_VERSION
+<span class="lineNum">     438 </span>            : } // namespace __detail
+<span class="lineNum">     439 </span>            : } // namespace
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.12</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
