@@ -6,12 +6,8 @@ private:
 public:
     int gen_chain_word(std::vector<std::string> &words, std::vector<std::string> &result, char head = 0, char tail = 0);
     int gen_chain_char(std::vector<std::string> &words, std::vector<std::string> &result, char head = 0, char tail = 0);
-<<<<<<< HEAD
-    int all_chain_word(std::vector<std::string> &words, std::set<std::vector<std::string>> &result, int n, char head = 0, char tail = 0);
-
-    std::vector<std::string> preprocessingData(std::string crudeData);
-=======
     int all_chain_word(std::vector<std::string> &words, std::set<std::vector<std::string>> &result, int n, int& error_flag, char head = 0, char tail = 0);
->>>>>>> origin/master
+
+    virtual std::vector<std::string> preprocessingData(std::string crudeData);
 };
 
