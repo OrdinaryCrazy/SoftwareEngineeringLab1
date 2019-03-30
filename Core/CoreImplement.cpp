@@ -49,7 +49,7 @@ int CoreImplement::gen_chain_word(std::vector<std::string> &words, std::vector<s
 int CoreImplement::gen_chain_char(std::vector<std::string> &words, std::vector<std::string> &result, char head, char tail)
 {   
     for(int i = 0;i < words.size();i++){
-        transform(words[i].begin(),words[i].end(),words[i].begin(),::toupper);
+        transform(words[i].begin(),words[i].end(),words[i].begin(),::tolower);
     }
 
     if(head == 0 && tail ==0){
