@@ -1,0 +1,679 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - CoreImplement.info - 5/bits/regex_compiler.tcc</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">5/bits</a> - regex_compiler.tcc<span style="font-size: 80%;"> (source / <a href="regex_compiler.tcc.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">CoreImplement.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">279</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-03-31 00:09:46</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">40</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : // class template regex -*- C++ -*-</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            : // Copyright (C) 2013-2015 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : // This file is part of the GNU ISO C++ Library.  This library is free
+<span class="lineNum">       6 </span>            : // software; you can redistribute it and/or modify it under the
+<span class="lineNum">       7 </span>            : // terms of the GNU General Public License as published by the
+<span class="lineNum">       8 </span>            : // Free Software Foundation; either version 3, or (at your option)
+<span class="lineNum">       9 </span>            : // any later version.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : // This library is distributed in the hope that it will be useful,
+<span class="lineNum">      12 </span>            : // but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      13 </span>            : // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      14 </span>            : // GNU General Public License for more details.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : // Under Section 7 of GPL version 3, you are granted additional
+<span class="lineNum">      17 </span>            : // permissions described in the GCC Runtime Library Exception, version
+<span class="lineNum">      18 </span>            : // 3.1, as published by the Free Software Foundation.
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : // You should have received a copy of the GNU General Public License and
+<span class="lineNum">      21 </span>            : // a copy of the GCC Runtime Library Exception along with this program;
+<span class="lineNum">      22 </span>            : // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+<span class="lineNum">      23 </span>            : // &lt;http://www.gnu.org/licenses/&gt;.
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : /**
+<span class="lineNum">      26 </span>            :  *  @file bits/regex_compiler.tcc
+<span class="lineNum">      27 </span>            :  *  This is an internal header file, included by other library headers.
+<span class="lineNum">      28 </span>            :  *  Do not attempt to use it directly. @headername{regex}
+<span class="lineNum">      29 </span>            :  */
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : // FIXME make comments doxygen format.
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : // This compiler refers to &quot;Regular Expression Matching Can Be Simple And Fast&quot;
+<span class="lineNum">      34 </span>            : // (http://swtch.com/~rsc/regexp/regexp1.html&quot;),
+<span class="lineNum">      35 </span>            : // but doesn't strictly follow it.
+<span class="lineNum">      36 </span>            : //
+<span class="lineNum">      37 </span>            : // When compiling, states are *chained* instead of tree- or graph-constructed.
+<span class="lineNum">      38 </span>            : // It's more like structured programs: there's if statement and loop statement.
+<span class="lineNum">      39 </span>            : //
+<span class="lineNum">      40 </span>            : // For alternative structure (say &quot;a|b&quot;), aka &quot;if statement&quot;, two branches
+<span class="lineNum">      41 </span>            : // should be constructed. However, these two shall merge to an &quot;end_tag&quot; at
+<span class="lineNum">      42 </span>            : // the end of this operator:
+<span class="lineNum">      43 </span>            : //
+<span class="lineNum">      44 </span>            : //                branch1
+<span class="lineNum">      45 </span>            : //              /        \
+<span class="lineNum">      46 </span>            : // =&gt; begin_tag            end_tag =&gt;
+<span class="lineNum">      47 </span>            : //              \        /
+<span class="lineNum">      48 </span>            : //                branch2
+<span class="lineNum">      49 </span>            : //
+<span class="lineNum">      50 </span>            : // This is the difference between this implementation and that in Russ's
+<span class="lineNum">      51 </span>            : // article.
+<span class="lineNum">      52 </span>            : //
+<span class="lineNum">      53 </span>            : // That's why we introduced dummy node here ------ &quot;end_tag&quot; is a dummy node.
+<span class="lineNum">      54 </span>            : // All dummy node will be eliminated at the end of compiling process.
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            : namespace std _GLIBCXX_VISIBILITY(default)
+<span class="lineNum">      57 </span>            : {
+<span class="lineNum">      58 </span>            : namespace __detail
+<span class="lineNum">      59 </span>            : {
+<span class="lineNum">      60 </span>            : _GLIBCXX_BEGIN_NAMESPACE_VERSION
+<a name="61"><span class="lineNum">      61 </span>            : </a>
+<span class="lineNum">      62 </span>            :   template&lt;typename _TraitsT&gt;
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :     _Compiler&lt;_TraitsT&gt;::</span>
+<span class="lineNum">      64 </span>            :     _Compiler(_IterT __b, _IterT __e,
+<span class="lineNum">      65 </span>            :               const typename _TraitsT::locale_type&amp; __loc, _FlagT __flags)
+<span class="lineNum">      66 </span>            :     : _M_flags((__flags
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :                 &amp; (regex_constants::ECMAScript</span>
+<span class="lineNum">      68 </span>            :                    | regex_constants::basic
+<span class="lineNum">      69 </span>            :                    | regex_constants::extended
+<span class="lineNum">      70 </span>            :                    | regex_constants::grep
+<span class="lineNum">      71 </span>            :                    | regex_constants::egrep
+<span class="lineNum">      72 </span>            :                    | regex_constants::awk))
+<span class="lineNum">      73 </span>            :                ? __flags
+<span class="lineNum">      74 </span>            :                : __flags | regex_constants::ECMAScript),
+<span class="lineNum">      75 </span>            :       _M_scanner(__b, __e, _M_flags, __loc),
+<span class="lineNum">      76 </span>            :       _M_nfa(make_shared&lt;_RegexT&gt;(__loc, _M_flags)),
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :       _M_traits(_M_nfa-&gt;_M_traits),</span>
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :       _M_ctype(std::use_facet&lt;_CtypeT&gt;(__loc))</span>
+<span class="lineNum">      79 </span>            :     {
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :       _StateSeqT __r(*_M_nfa, _M_nfa-&gt;_M_start());</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :       __r._M_append(_M_nfa-&gt;_M_insert_subexpr_begin());</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :       this-&gt;_M_disjunction();</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :       if (!_M_match_token(_ScannerT::_S_token_eof))</span>
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :         __throw_regex_error(regex_constants::error_paren);</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :       __r._M_append(_M_pop());</span>
+<span class="lineNum">      86 </span>            :       _GLIBCXX_DEBUG_ASSERT(_M_stack.empty());
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :       __r._M_append(_M_nfa-&gt;_M_insert_subexpr_end());</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :       __r._M_append(_M_nfa-&gt;_M_insert_accept());</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :       _M_nfa-&gt;_M_eliminate_dummy();</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">      91 </span>            : 
+<a name="92"><span class="lineNum">      92 </span>            :   template&lt;typename _TraitsT&gt;</a>
+<span class="lineNum">      93 </span>            :     void
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :     _Compiler&lt;_TraitsT&gt;::</span>
+<span class="lineNum">      95 </span>            :     _M_disjunction()
+<span class="lineNum">      96 </span>            :     {
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :       this-&gt;_M_alternative();</span>
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :       while (_M_match_token(_ScannerT::_S_token_or))</span>
+<span class="lineNum">      99 </span>            :         {
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :           _StateSeqT __alt1 = _M_pop();</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :           this-&gt;_M_alternative();</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :           _StateSeqT __alt2 = _M_pop();</span>
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :           auto __end = _M_nfa-&gt;_M_insert_dummy();</span>
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :           __alt1._M_append(__end);</span>
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :           __alt2._M_append(__end);</span>
+<span class="lineNum">     106 </span>            :           // __alt2 is state._M_next, __alt1 is state._M_alt. The executor
+<span class="lineNum">     107 </span>            :           // executes _M_alt before _M_next, as well as executing left
+<span class="lineNum">     108 </span>            :           // alternative before right one.
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :           _M_stack.push(_StateSeqT(*_M_nfa,</span>
+<span class="lineNum">     110 </span>            :                                    _M_nfa-&gt;_M_insert_alt(
+<span class="lineNum">     111 </span>            :                                      __alt2._M_start, __alt1._M_start, false),
+<span class="lineNum">     112 </span>            :                                    __end));
+<span class="lineNum">     113 </span>            :         }
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     115 </span>            : 
+<a name="116"><span class="lineNum">     116 </span>            :   template&lt;typename _TraitsT&gt;</a>
+<span class="lineNum">     117 </span>            :     void
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :     _Compiler&lt;_TraitsT&gt;::</span>
+<span class="lineNum">     119 </span>            :     _M_alternative()
+<span class="lineNum">     120 </span>            :     {
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :       if (this-&gt;_M_term())</span>
+<span class="lineNum">     122 </span>            :         {
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :           _StateSeqT __re = _M_pop();</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :           this-&gt;_M_alternative();</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :           __re._M_append(_M_pop());</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :           _M_stack.push(__re);</span>
+<span class="lineNum">     127 </span>            :         }
+<span class="lineNum">     128 </span>            :       else
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :         _M_stack.push(_StateSeqT(*_M_nfa, _M_nfa-&gt;_M_insert_dummy()));</span>
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     131 </span>            : 
+<a name="132"><span class="lineNum">     132 </span>            :   template&lt;typename _TraitsT&gt;</a>
+<span class="lineNum">     133 </span>            :     bool
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :     _Compiler&lt;_TraitsT&gt;::</span>
+<span class="lineNum">     135 </span>            :     _M_term()
+<span class="lineNum">     136 </span>            :     {
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :       if (this-&gt;_M_assertion())</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :         return true;</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :       if (this-&gt;_M_atom())</span>
+<span class="lineNum">     140 </span>            :         {
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :           while (this-&gt;_M_quantifier());</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :           return true;</span>
+<span class="lineNum">     143 </span>            :         }
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :       return false;</span>
+<span class="lineNum">     145 </span>            :     }
+<span class="lineNum">     146 </span>            : 
+<a name="147"><span class="lineNum">     147 </span>            :   template&lt;typename _TraitsT&gt;</a>
+<span class="lineNum">     148 </span>            :     bool
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :     _Compiler&lt;_TraitsT&gt;::</span>
+<span class="lineNum">     150 </span>            :     _M_assertion()
+<span class="lineNum">     151 </span>            :     {
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :       if (_M_match_token(_ScannerT::_S_token_line_begin))</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :         _M_stack.push(_StateSeqT(*_M_nfa, _M_nfa-&gt;_M_insert_line_begin()));</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :       else if (_M_match_token(_ScannerT::_S_token_line_end))</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :         _M_stack.push(_StateSeqT(*_M_nfa, _M_nfa-&gt;_M_insert_line_end()));</span>
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :       else if (_M_match_token(_ScannerT::_S_token_word_bound))</span>
+<span class="lineNum">     157 </span>            :         // _M_value[0] == 'n' means it's negative, say &quot;not word boundary&quot;.
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :         _M_stack.push(_StateSeqT(*_M_nfa, _M_nfa-&gt;</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :               _M_insert_word_bound(_M_value[0] == 'n')));</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :       else if (_M_match_token(_ScannerT::_S_token_subexpr_lookahead_begin))</span>
+<span class="lineNum">     161 </span>            :         {
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :           auto __neg = _M_value[0] == 'n';</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :           this-&gt;_M_disjunction();</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :           if (!_M_match_token(_ScannerT::_S_token_subexpr_end))</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :             __throw_regex_error(regex_constants::error_paren);</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :           auto __tmp = _M_pop();</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :           __tmp._M_append(_M_nfa-&gt;_M_insert_accept());</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :           _M_stack.push(</span>
+<span class="lineNum">     169 </span>            :               _StateSeqT(
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :                 *_M_nfa,</span>
+<span class="lineNum">     171 </span>            :                 _M_nfa-&gt;_M_insert_lookahead(__tmp._M_start, __neg)));
+<span class="lineNum">     172 </span>            :         }
+<span class="lineNum">     173 </span>            :       else
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :         return false;</span>
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :       return true;</span>
+<span class="lineNum">     176 </span>            :     }
+<span class="lineNum">     177 </span>            : 
+<a name="178"><span class="lineNum">     178 </span>            :   template&lt;typename _TraitsT&gt;</a>
+<span class="lineNum">     179 </span>            :     bool
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :     _Compiler&lt;_TraitsT&gt;::</span>
+<span class="lineNum">     181 </span>            :     _M_quantifier()
+<a name="182"><span class="lineNum">     182 </span>            :     {</a>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :       bool __neg = (_M_flags &amp; regex_constants::ECMAScript);</span>
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :       auto __init = [this, &amp;__neg]()</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :         {</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :           if (_M_stack.empty())</span>
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :             __throw_regex_error(regex_constants::error_badrepeat);</span>
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :           __neg = __neg &amp;&amp; _M_match_token(_ScannerT::_S_token_opt);</span>
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :         };</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :       if (_M_match_token(_ScannerT::_S_token_closure0))</span>
+<span class="lineNum">     191 </span>            :         {
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :           __init();</span>
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :           auto __e = _M_pop();</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :           _StateSeqT __r(*_M_nfa,</span>
+<span class="lineNum">     195 </span>            :                          _M_nfa-&gt;_M_insert_repeat(_S_invalid_state_id,
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :                                                   __e._M_start, __neg));</span>
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :           __e._M_append(__r);</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :           _M_stack.push(__r);</span>
+<span class="lineNum">     199 </span>            :         }
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :       else if (_M_match_token(_ScannerT::_S_token_closure1))</span>
+<span class="lineNum">     201 </span>            :         {
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :           __init();</span>
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :           auto __e = _M_pop();</span>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :           __e._M_append(_M_nfa-&gt;_M_insert_repeat(_S_invalid_state_id,</span>
+<span class="lineNum">     205 </span>            :                                                  __e._M_start, __neg));
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :           _M_stack.push(__e);</span>
+<span class="lineNum">     207 </span>            :         }
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :       else if (_M_match_token(_ScannerT::_S_token_opt))</span>
+<span class="lineNum">     209 </span>            :         {
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :           __init();</span>
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :           auto __e = _M_pop();</span>
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :           auto __end = _M_nfa-&gt;_M_insert_dummy();</span>
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :           _StateSeqT __r(*_M_nfa,</span>
+<span class="lineNum">     214 </span>            :                          _M_nfa-&gt;_M_insert_repeat(_S_invalid_state_id,
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :                                                   __e._M_start, __neg));</span>
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :           __e._M_append(__end);</span>
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :           __r._M_append(__end);</span>
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :           _M_stack.push(__r);</span>
+<span class="lineNum">     219 </span>            :         }
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :       else if (_M_match_token(_ScannerT::_S_token_interval_begin))</span>
+<span class="lineNum">     221 </span>            :         {
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :           if (_M_stack.empty())</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :             __throw_regex_error(regex_constants::error_badrepeat);</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :           if (!_M_match_token(_ScannerT::_S_token_dup_count))</span>
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :             __throw_regex_error(regex_constants::error_badbrace);</span>
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :           _StateSeqT __r(_M_pop());</span>
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :           _StateSeqT __e(*_M_nfa, _M_nfa-&gt;_M_insert_dummy());</span>
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :           long __min_rep = _M_cur_int_value(10);</span>
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :           bool __infi = false;</span>
+<span class="lineNum">     230 </span>            :           long __n;
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span>            :           // {3
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :           if (_M_match_token(_ScannerT::_S_token_comma))</span>
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :             if (_M_match_token(_ScannerT::_S_token_dup_count)) // {3,7}</span>
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :               __n = _M_cur_int_value(10) - __min_rep;</span>
+<span class="lineNum">     236 </span>            :             else
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :               __infi = true;</span>
+<span class="lineNum">     238 </span>            :           else
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :             __n = 0;</span>
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :           if (!_M_match_token(_ScannerT::_S_token_interval_end))</span>
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :             __throw_regex_error(regex_constants::error_brace);</span>
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :           __neg = __neg &amp;&amp; _M_match_token(_ScannerT::_S_token_opt);</span>
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :           for (long __i = 0; __i &lt; __min_rep; ++__i)</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :             __e._M_append(__r._M_clone());</span>
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 :           if (__infi)</span>
+<span class="lineNum">     249 </span>            :             {
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :               auto __tmp = __r._M_clone();</span>
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :               _StateSeqT __s(*_M_nfa,</span>
+<span class="lineNum">     252 </span>            :                              _M_nfa-&gt;_M_insert_repeat(_S_invalid_state_id,
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 :                                                       __tmp._M_start, __neg));</span>
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :               __tmp._M_append(__s);</span>
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :               __e._M_append(__s);</span>
+<span class="lineNum">     256 </span>            :             }
+<span class="lineNum">     257 </span>            :           else
+<span class="lineNum">     258 </span>            :             {
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :               if (__n &lt; 0)</span>
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :                 __throw_regex_error(regex_constants::error_badbrace);</span>
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :               auto __end = _M_nfa-&gt;_M_insert_dummy();</span>
+<span class="lineNum">     262 </span>            :               // _M_alt is the &quot;match more&quot; branch, and _M_next is the
+<span class="lineNum">     263 </span>            :               // &quot;match less&quot; one. Switch _M_alt and _M_next of all created
+<span class="lineNum">     264 </span>            :               // nodes. This is a hack but IMO works well.
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :               std::stack&lt;_StateIdT&gt; __stack;</span>
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :               for (long __i = 0; __i &lt; __n; ++__i)</span>
+<span class="lineNum">     267 </span>            :                 {
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :                   auto __tmp = __r._M_clone();</span>
+<span class="lineNum">     269 </span>            :                   auto __alt = _M_nfa-&gt;_M_insert_repeat(__tmp._M_start,
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :                                                         __end, __neg);</span>
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :                   __stack.push(__alt);</span>
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :                   __e._M_append(_StateSeqT(*_M_nfa, __alt, __tmp._M_end));</span>
+<span class="lineNum">     273 </span>            :                 }
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :               __e._M_append(__end);</span>
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :               while (!__stack.empty())</span>
+<span class="lineNum">     276 </span>            :                 {
+<span class="lineNum">     277 </span><span class="lineNoCov">          0 :                   auto&amp; __tmp = (*_M_nfa)[__stack.top()];</span>
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :                   __stack.pop();</span>
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :                   std::swap(__tmp._M_next, __tmp._M_alt);</span>
+<span class="lineNum">     280 </span>            :                 }
+<span class="lineNum">     281 </span>            :             }
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :           _M_stack.push(__e);</span>
+<span class="lineNum">     283 </span>            :         }
+<span class="lineNum">     284 </span>            :       else
+<span class="lineNum">     285 </span><span class="lineNoCov">          0 :         return false;</span>
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :       return true;</span>
+<span class="lineNum">     287 </span>            :     }
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span>            : #define __INSERT_REGEX_MATCHER(__func, args...)\
+<span class="lineNum">     290 </span>            :         do\
+<span class="lineNum">     291 </span>            :           if (!(_M_flags &amp; regex_constants::icase))\
+<span class="lineNum">     292 </span>            :             if (!(_M_flags &amp; regex_constants::collate))\
+<span class="lineNum">     293 </span>            :               __func&lt;false, false&gt;(args);\
+<span class="lineNum">     294 </span>            :             else\
+<span class="lineNum">     295 </span>            :               __func&lt;false, true&gt;(args);\
+<span class="lineNum">     296 </span>            :           else\
+<span class="lineNum">     297 </span>            :             if (!(_M_flags &amp; regex_constants::collate))\
+<span class="lineNum">     298 </span>            :               __func&lt;true, false&gt;(args);\
+<span class="lineNum">     299 </span>            :             else\
+<span class="lineNum">     300 </span>            :               __func&lt;true, true&gt;(args);\
+<span class="lineNum">     301 </span>            :         while (false)
+<span class="lineNum">     302 </span>            : 
+<a name="303"><span class="lineNum">     303 </span>            :   template&lt;typename _TraitsT&gt;</a>
+<span class="lineNum">     304 </span>            :     bool
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :     _Compiler&lt;_TraitsT&gt;::</span>
+<span class="lineNum">     306 </span>            :     _M_atom()
+<span class="lineNum">     307 </span>            :     {
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :       if (_M_match_token(_ScannerT::_S_token_anychar))</span>
+<span class="lineNum">     309 </span>            :         {
+<span class="lineNum">     310 </span><span class="lineNoCov">          0 :           if (!(_M_flags &amp; regex_constants::ECMAScript))</span>
+<span class="lineNum">     311 </span><span class="lineNoCov">          0 :             __INSERT_REGEX_MATCHER(_M_insert_any_matcher_posix);</span>
+<span class="lineNum">     312 </span>            :           else
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :             __INSERT_REGEX_MATCHER(_M_insert_any_matcher_ecma);</span>
+<span class="lineNum">     314 </span>            :         }
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :       else if (_M_try_char())</span>
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :         __INSERT_REGEX_MATCHER(_M_insert_char_matcher);</span>
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :       else if (_M_match_token(_ScannerT::_S_token_backref))</span>
+<span class="lineNum">     318 </span><span class="lineNoCov">          0 :         _M_stack.push(_StateSeqT(*_M_nfa, _M_nfa-&gt;</span>
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :                                  _M_insert_backref(_M_cur_int_value(10))));</span>
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :       else if (_M_match_token(_ScannerT::_S_token_quoted_class))</span>
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :         __INSERT_REGEX_MATCHER(_M_insert_character_class_matcher);</span>
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :       else if (_M_match_token(_ScannerT::_S_token_subexpr_no_group_begin))</span>
+<span class="lineNum">     323 </span>            :         {
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :           _StateSeqT __r(*_M_nfa, _M_nfa-&gt;_M_insert_dummy());</span>
+<span class="lineNum">     325 </span><span class="lineNoCov">          0 :           this-&gt;_M_disjunction();</span>
+<span class="lineNum">     326 </span><span class="lineNoCov">          0 :           if (!_M_match_token(_ScannerT::_S_token_subexpr_end))</span>
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :             __throw_regex_error(regex_constants::error_paren);</span>
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :           __r._M_append(_M_pop());</span>
+<span class="lineNum">     329 </span><span class="lineNoCov">          0 :           _M_stack.push(__r);</span>
+<span class="lineNum">     330 </span>            :         }
+<span class="lineNum">     331 </span><span class="lineNoCov">          0 :       else if (_M_match_token(_ScannerT::_S_token_subexpr_begin))</span>
+<span class="lineNum">     332 </span>            :         {
+<span class="lineNum">     333 </span><span class="lineNoCov">          0 :           _StateSeqT __r(*_M_nfa, _M_nfa-&gt;_M_insert_subexpr_begin());</span>
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :           this-&gt;_M_disjunction();</span>
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 :           if (!_M_match_token(_ScannerT::_S_token_subexpr_end))</span>
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :             __throw_regex_error(regex_constants::error_paren);</span>
+<span class="lineNum">     337 </span><span class="lineNoCov">          0 :           __r._M_append(_M_pop());</span>
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 :           __r._M_append(_M_nfa-&gt;_M_insert_subexpr_end());</span>
+<span class="lineNum">     339 </span><span class="lineNoCov">          0 :           _M_stack.push(__r);</span>
+<span class="lineNum">     340 </span>            :         }
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :       else if (!_M_bracket_expression())</span>
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 :         return false;</span>
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :       return true;</span>
+<span class="lineNum">     344 </span>            :     }
+<span class="lineNum">     345 </span>            : 
+<a name="346"><span class="lineNum">     346 </span>            :   template&lt;typename _TraitsT&gt;</a>
+<span class="lineNum">     347 </span>            :     bool
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :     _Compiler&lt;_TraitsT&gt;::</span>
+<span class="lineNum">     349 </span>            :     _M_bracket_expression()
+<span class="lineNum">     350 </span>            :     {
+<span class="lineNum">     351 </span>            :       bool __neg =
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :         _M_match_token(_ScannerT::_S_token_bracket_neg_begin);</span>
+<span class="lineNum">     353 </span><span class="lineNoCov">          0 :       if (!(__neg || _M_match_token(_ScannerT::_S_token_bracket_begin)))</span>
+<span class="lineNum">     354 </span><span class="lineNoCov">          0 :         return false;</span>
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 :       __INSERT_REGEX_MATCHER(_M_insert_bracket_matcher, __neg);</span>
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :       return true;</span>
+<span class="lineNum">     357 </span>            :     }
+<span class="lineNum">     358 </span>            : #undef __INSERT_REGEX_MATCHER
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span>            :   template&lt;typename _TraitsT&gt;
+<a name="361"><span class="lineNum">     361 </span>            :   template&lt;bool __icase, bool __collate&gt;</a>
+<span class="lineNum">     362 </span>            :     void
+<span class="lineNum">     363 </span><span class="lineNoCov">          0 :     _Compiler&lt;_TraitsT&gt;::</span>
+<span class="lineNum">     364 </span>            :     _M_insert_any_matcher_ecma()
+<span class="lineNum">     365 </span>            :     {
+<span class="lineNum">     366 </span><span class="lineNoCov">          0 :       _M_stack.push(_StateSeqT(*_M_nfa,</span>
+<span class="lineNum">     367 </span>            :         _M_nfa-&gt;_M_insert_matcher
+<span class="lineNum">     368 </span>            :           (_AnyMatcher&lt;_TraitsT, true, __icase, __collate&gt;
+<span class="lineNum">     369 </span>            :             (_M_traits))));
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     371 </span>            : 
+<span class="lineNum">     372 </span>            :   template&lt;typename _TraitsT&gt;
+<a name="373"><span class="lineNum">     373 </span>            :   template&lt;bool __icase, bool __collate&gt;</a>
+<span class="lineNum">     374 </span>            :     void
+<span class="lineNum">     375 </span><span class="lineNoCov">          0 :     _Compiler&lt;_TraitsT&gt;::</span>
+<span class="lineNum">     376 </span>            :     _M_insert_any_matcher_posix()
+<span class="lineNum">     377 </span>            :     {
+<span class="lineNum">     378 </span><span class="lineNoCov">          0 :       _M_stack.push(_StateSeqT(*_M_nfa,</span>
+<span class="lineNum">     379 </span>            :         _M_nfa-&gt;_M_insert_matcher
+<span class="lineNum">     380 </span>            :           (_AnyMatcher&lt;_TraitsT, false, __icase, __collate&gt;
+<span class="lineNum">     381 </span>            :             (_M_traits))));
+<span class="lineNum">     382 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     383 </span>            : 
+<span class="lineNum">     384 </span>            :   template&lt;typename _TraitsT&gt;
+<a name="385"><span class="lineNum">     385 </span>            :   template&lt;bool __icase, bool __collate&gt;</a>
+<span class="lineNum">     386 </span>            :     void
+<span class="lineNum">     387 </span><span class="lineNoCov">          0 :     _Compiler&lt;_TraitsT&gt;::</span>
+<span class="lineNum">     388 </span>            :     _M_insert_char_matcher()
+<span class="lineNum">     389 </span>            :     {
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :       _M_stack.push(_StateSeqT(*_M_nfa,</span>
+<span class="lineNum">     391 </span>            :         _M_nfa-&gt;_M_insert_matcher
+<span class="lineNum">     392 </span>            :           (_CharMatcher&lt;_TraitsT, __icase, __collate&gt;
+<span class="lineNum">     393 </span><span class="lineNoCov">          0 :             (_M_value[0], _M_traits))));</span>
+<span class="lineNum">     394 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     395 </span>            : 
+<span class="lineNum">     396 </span>            :   template&lt;typename _TraitsT&gt;
+<a name="397"><span class="lineNum">     397 </span>            :   template&lt;bool __icase, bool __collate&gt;</a>
+<span class="lineNum">     398 </span>            :     void
+<span class="lineNum">     399 </span><span class="lineNoCov">          0 :     _Compiler&lt;_TraitsT&gt;::</span>
+<span class="lineNum">     400 </span>            :     _M_insert_character_class_matcher()
+<span class="lineNum">     401 </span>            :     {
+<span class="lineNum">     402 </span>            :       _GLIBCXX_DEBUG_ASSERT(_M_value.size() == 1);
+<span class="lineNum">     403 </span>            :       _BracketMatcher&lt;_TraitsT, __icase, __collate&gt; __matcher
+<span class="lineNum">     404 </span><span class="lineNoCov">          0 :         (_M_ctype.is(_CtypeT::upper, _M_value[0]), _M_traits);</span>
+<span class="lineNum">     405 </span><span class="lineNoCov">          0 :       __matcher._M_add_character_class(_M_value, false);</span>
+<span class="lineNum">     406 </span><span class="lineNoCov">          0 :       __matcher._M_ready();</span>
+<span class="lineNum">     407 </span><span class="lineNoCov">          0 :       _M_stack.push(_StateSeqT(*_M_nfa,</span>
+<span class="lineNum">     408 </span><span class="lineNoCov">          0 :         _M_nfa-&gt;_M_insert_matcher(std::move(__matcher))));</span>
+<span class="lineNum">     409 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     410 </span>            : 
+<span class="lineNum">     411 </span>            :   template&lt;typename _TraitsT&gt;
+<a name="412"><span class="lineNum">     412 </span>            :   template&lt;bool __icase, bool __collate&gt;</a>
+<span class="lineNum">     413 </span>            :     void
+<span class="lineNum">     414 </span><span class="lineNoCov">          0 :     _Compiler&lt;_TraitsT&gt;::</span>
+<span class="lineNum">     415 </span>            :     _M_insert_bracket_matcher(bool __neg)
+<span class="lineNum">     416 </span>            :     {
+<span class="lineNum">     417 </span><span class="lineNoCov">          0 :       _BracketMatcher&lt;_TraitsT, __icase, __collate&gt; __matcher(__neg, _M_traits);</span>
+<span class="lineNum">     418 </span><span class="lineNoCov">          0 :       pair&lt;bool, _CharT&gt; __last_char; // Optional&lt;_CharT&gt;</span>
+<span class="lineNum">     419 </span><span class="lineNoCov">          0 :       __last_char.first = false;</span>
+<span class="lineNum">     420 </span><span class="lineNoCov">          0 :       if (!(_M_flags &amp; regex_constants::ECMAScript))</span>
+<span class="lineNum">     421 </span><span class="lineNoCov">          0 :         if (_M_try_char())</span>
+<span class="lineNum">     422 </span>            :           {
+<span class="lineNum">     423 </span><span class="lineNoCov">          0 :             __matcher._M_add_char(_M_value[0]);</span>
+<span class="lineNum">     424 </span><span class="lineNoCov">          0 :             __last_char.first = true;</span>
+<span class="lineNum">     425 </span><span class="lineNoCov">          0 :             __last_char.second = _M_value[0];</span>
+<span class="lineNum">     426 </span>            :           }
+<span class="lineNum">     427 </span><span class="lineNoCov">          0 :       while (_M_expression_term(__last_char, __matcher));</span>
+<span class="lineNum">     428 </span><span class="lineNoCov">          0 :       __matcher._M_ready();</span>
+<span class="lineNum">     429 </span><span class="lineNoCov">          0 :       _M_stack.push(_StateSeqT(</span>
+<span class="lineNum">     430 </span><span class="lineNoCov">          0 :                       *_M_nfa,</span>
+<span class="lineNum">     431 </span><span class="lineNoCov">          0 :                       _M_nfa-&gt;_M_insert_matcher(std::move(__matcher))));</span>
+<span class="lineNum">     432 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     433 </span>            : 
+<span class="lineNum">     434 </span>            :   template&lt;typename _TraitsT&gt;
+<a name="435"><span class="lineNum">     435 </span>            :   template&lt;bool __icase, bool __collate&gt;</a>
+<span class="lineNum">     436 </span>            :     bool
+<span class="lineNum">     437 </span><span class="lineNoCov">          0 :     _Compiler&lt;_TraitsT&gt;::</span>
+<span class="lineNum">     438 </span>            :     _M_expression_term(pair&lt;bool, _CharT&gt;&amp; __last_char,
+<span class="lineNum">     439 </span>            :                        _BracketMatcher&lt;_TraitsT, __icase, __collate&gt;&amp; __matcher)
+<span class="lineNum">     440 </span>            :     {
+<span class="lineNum">     441 </span><span class="lineNoCov">          0 :       if (_M_match_token(_ScannerT::_S_token_bracket_end))</span>
+<span class="lineNum">     442 </span><span class="lineNoCov">          0 :         return false;</span>
+<span class="lineNum">     443 </span>            : 
+<span class="lineNum">     444 </span><span class="lineNoCov">          0 :       if (_M_match_token(_ScannerT::_S_token_collsymbol))</span>
+<span class="lineNum">     445 </span>            :         {
+<span class="lineNum">     446 </span><span class="lineNoCov">          0 :           auto __symbol = __matcher._M_add_collate_element(_M_value);</span>
+<span class="lineNum">     447 </span><span class="lineNoCov">          0 :           if (__symbol.size() == 1)</span>
+<span class="lineNum">     448 </span>            :             {
+<span class="lineNum">     449 </span><span class="lineNoCov">          0 :               __last_char.first = true;</span>
+<span class="lineNum">     450 </span><span class="lineNoCov">          0 :               __last_char.second = __symbol[0];</span>
+<span class="lineNum">     451 </span>            :             }
+<span class="lineNum">     452 </span>            :         }
+<span class="lineNum">     453 </span><span class="lineNoCov">          0 :       else if (_M_match_token(_ScannerT::_S_token_equiv_class_name))</span>
+<span class="lineNum">     454 </span><span class="lineNoCov">          0 :         __matcher._M_add_equivalence_class(_M_value);</span>
+<span class="lineNum">     455 </span><span class="lineNoCov">          0 :       else if (_M_match_token(_ScannerT::_S_token_char_class_name))</span>
+<span class="lineNum">     456 </span><span class="lineNoCov">          0 :         __matcher._M_add_character_class(_M_value, false);</span>
+<span class="lineNum">     457 </span>            :       // POSIX doesn't allow '-' as a start-range char (say [a-z--0]),
+<span class="lineNum">     458 </span>            :       // except when the '-' is the first or last character in the bracket
+<span class="lineNum">     459 </span>            :       // expression ([--0]). ECMAScript treats all '-' after a range as a
+<span class="lineNum">     460 </span>            :       // normal character. Also see above, where _M_expression_term gets called.
+<span class="lineNum">     461 </span>            :       //
+<span class="lineNum">     462 </span>            :       // As a result, POSIX rejects [-----], but ECMAScript doesn't.
+<span class="lineNum">     463 </span>            :       // Boost (1.57.0) always uses POSIX style even in its ECMAScript syntax.
+<span class="lineNum">     464 </span>            :       // Clang (3.5) always uses ECMAScript style even in its POSIX syntax.
+<span class="lineNum">     465 </span>            :       //
+<span class="lineNum">     466 </span>            :       // It turns out that no one reads BNFs ;)
+<span class="lineNum">     467 </span><span class="lineNoCov">          0 :       else if (_M_try_char())</span>
+<span class="lineNum">     468 </span>            :         {
+<span class="lineNum">     469 </span><span class="lineNoCov">          0 :           if (!__last_char.first)</span>
+<span class="lineNum">     470 </span>            :             {
+<span class="lineNum">     471 </span><span class="lineNoCov">          0 :               __matcher._M_add_char(_M_value[0]);</span>
+<span class="lineNum">     472 </span><span class="lineNoCov">          0 :               if (_M_value[0] == '-'</span>
+<span class="lineNum">     473 </span><span class="lineNoCov">          0 :                   &amp;&amp; !(_M_flags &amp; regex_constants::ECMAScript))</span>
+<span class="lineNum">     474 </span>            :                 {
+<span class="lineNum">     475 </span><span class="lineNoCov">          0 :                   if (_M_match_token(_ScannerT::_S_token_bracket_end))</span>
+<span class="lineNum">     476 </span><span class="lineNoCov">          0 :                     return false;</span>
+<span class="lineNum">     477 </span><span class="lineNoCov">          0 :                   __throw_regex_error(regex_constants::error_range);</span>
+<span class="lineNum">     478 </span>            :                 }
+<span class="lineNum">     479 </span><span class="lineNoCov">          0 :               __last_char.first = true;</span>
+<span class="lineNum">     480 </span><span class="lineNoCov">          0 :               __last_char.second = _M_value[0];</span>
+<span class="lineNum">     481 </span>            :             }
+<span class="lineNum">     482 </span>            :           else
+<span class="lineNum">     483 </span>            :             {
+<span class="lineNum">     484 </span><span class="lineNoCov">          0 :               if (_M_value[0] == '-')</span>
+<span class="lineNum">     485 </span>            :                 {
+<span class="lineNum">     486 </span><span class="lineNoCov">          0 :                   if (_M_try_char())</span>
+<span class="lineNum">     487 </span>            :                     {
+<span class="lineNum">     488 </span><span class="lineNoCov">          0 :                       __matcher._M_make_range(__last_char.second , _M_value[0]);</span>
+<span class="lineNum">     489 </span><span class="lineNoCov">          0 :                       __last_char.first = false;</span>
+<span class="lineNum">     490 </span>            :                     }
+<span class="lineNum">     491 </span>            :                   else
+<span class="lineNum">     492 </span>            :                     {
+<span class="lineNum">     493 </span><span class="lineNoCov">          0 :                       if (_M_scanner._M_get_token()</span>
+<span class="lineNum">     494 </span><span class="lineNoCov">          0 :                           != _ScannerT::_S_token_bracket_end)</span>
+<span class="lineNum">     495 </span><span class="lineNoCov">          0 :                         __throw_regex_error(regex_constants::error_range);</span>
+<span class="lineNum">     496 </span><span class="lineNoCov">          0 :                       __matcher._M_add_char(_M_value[0]);</span>
+<span class="lineNum">     497 </span>            :                     }
+<span class="lineNum">     498 </span>            :                 }
+<span class="lineNum">     499 </span>            :               else
+<span class="lineNum">     500 </span>            :                 {
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 :                   __matcher._M_add_char(_M_value[0]);</span>
+<span class="lineNum">     502 </span><span class="lineNoCov">          0 :                   __last_char.second = _M_value[0];</span>
+<span class="lineNum">     503 </span>            :                 }
+<span class="lineNum">     504 </span>            :             }
+<span class="lineNum">     505 </span>            :         }
+<span class="lineNum">     506 </span><span class="lineNoCov">          0 :       else if (_M_match_token(_ScannerT::_S_token_quoted_class))</span>
+<span class="lineNum">     507 </span><span class="lineNoCov">          0 :         __matcher._M_add_character_class(_M_value,</span>
+<span class="lineNum">     508 </span>            :                                          _M_ctype.is(_CtypeT::upper,
+<span class="lineNum">     509 </span><span class="lineNoCov">          0 :                                                      _M_value[0]));</span>
+<span class="lineNum">     510 </span>            :       else
+<span class="lineNum">     511 </span><span class="lineNoCov">          0 :         __throw_regex_error(regex_constants::error_brack);</span>
+<span class="lineNum">     512 </span>            : 
+<span class="lineNum">     513 </span><span class="lineNoCov">          0 :       return true;</span>
+<span class="lineNum">     514 </span>            :     }
+<span class="lineNum">     515 </span>            : 
+<a name="516"><span class="lineNum">     516 </span>            :   template&lt;typename _TraitsT&gt;</a>
+<span class="lineNum">     517 </span>            :     bool
+<span class="lineNum">     518 </span><span class="lineNoCov">          0 :     _Compiler&lt;_TraitsT&gt;::</span>
+<span class="lineNum">     519 </span>            :     _M_try_char()
+<span class="lineNum">     520 </span>            :     {
+<span class="lineNum">     521 </span><span class="lineNoCov">          0 :       bool __is_char = false;</span>
+<span class="lineNum">     522 </span><span class="lineNoCov">          0 :       if (_M_match_token(_ScannerT::_S_token_oct_num))</span>
+<span class="lineNum">     523 </span>            :         {
+<span class="lineNum">     524 </span><span class="lineNoCov">          0 :           __is_char = true;</span>
+<span class="lineNum">     525 </span><span class="lineNoCov">          0 :           _M_value.assign(1, _M_cur_int_value(8));</span>
+<span class="lineNum">     526 </span>            :         }
+<span class="lineNum">     527 </span><span class="lineNoCov">          0 :       else if (_M_match_token(_ScannerT::_S_token_hex_num))</span>
+<span class="lineNum">     528 </span>            :         {
+<span class="lineNum">     529 </span><span class="lineNoCov">          0 :           __is_char = true;</span>
+<span class="lineNum">     530 </span><span class="lineNoCov">          0 :           _M_value.assign(1, _M_cur_int_value(16));</span>
+<span class="lineNum">     531 </span>            :         }
+<span class="lineNum">     532 </span><span class="lineNoCov">          0 :       else if (_M_match_token(_ScannerT::_S_token_ord_char))</span>
+<span class="lineNum">     533 </span><span class="lineNoCov">          0 :         __is_char = true;</span>
+<span class="lineNum">     534 </span><span class="lineNoCov">          0 :       return __is_char;</span>
+<span class="lineNum">     535 </span>            :     }
+<span class="lineNum">     536 </span>            : 
+<a name="537"><span class="lineNum">     537 </span>            :   template&lt;typename _TraitsT&gt;</a>
+<span class="lineNum">     538 </span>            :     bool
+<span class="lineNum">     539 </span><span class="lineNoCov">          0 :     _Compiler&lt;_TraitsT&gt;::</span>
+<span class="lineNum">     540 </span>            :     _M_match_token(_TokenT token)
+<span class="lineNum">     541 </span>            :     {
+<span class="lineNum">     542 </span><span class="lineNoCov">          0 :       if (token == _M_scanner._M_get_token())</span>
+<span class="lineNum">     543 </span>            :         {
+<span class="lineNum">     544 </span><span class="lineNoCov">          0 :           _M_value = _M_scanner._M_get_value();</span>
+<span class="lineNum">     545 </span><span class="lineNoCov">          0 :           _M_scanner._M_advance();</span>
+<span class="lineNum">     546 </span><span class="lineNoCov">          0 :           return true;</span>
+<span class="lineNum">     547 </span>            :         }
+<span class="lineNum">     548 </span><span class="lineNoCov">          0 :       return false;</span>
+<span class="lineNum">     549 </span>            :     }
+<span class="lineNum">     550 </span>            : 
+<a name="551"><span class="lineNum">     551 </span>            :   template&lt;typename _TraitsT&gt;</a>
+<span class="lineNum">     552 </span>            :     int
+<span class="lineNum">     553 </span><span class="lineNoCov">          0 :     _Compiler&lt;_TraitsT&gt;::</span>
+<span class="lineNum">     554 </span>            :     _M_cur_int_value(int __radix)
+<span class="lineNum">     555 </span>            :     {
+<span class="lineNum">     556 </span><span class="lineNoCov">          0 :       long __v = 0;</span>
+<span class="lineNum">     557 </span><span class="lineNoCov">          0 :       for (typename _StringT::size_type __i = 0;</span>
+<span class="lineNum">     558 </span><span class="lineNoCov">          0 :            __i &lt; _M_value.length(); ++__i)</span>
+<span class="lineNum">     559 </span><span class="lineNoCov">          0 :         __v =__v * __radix + _M_traits.value(_M_value[__i], __radix);</span>
+<span class="lineNum">     560 </span><span class="lineNoCov">          0 :       return __v;</span>
+<span class="lineNum">     561 </span>            :     }
+<span class="lineNum">     562 </span>            : 
+<a name="563"><span class="lineNum">     563 </span>            :   template&lt;typename _TraitsT, bool __icase, bool __collate&gt;</a>
+<span class="lineNum">     564 </span>            :     bool
+<span class="lineNum">     565 </span><span class="lineNoCov">          0 :     _BracketMatcher&lt;_TraitsT, __icase, __collate&gt;::</span>
+<span class="lineNum">     566 </span>            :     _M_apply(_CharT __ch, false_type) const
+<span class="lineNum">     567 </span>            :     {
+<span class="lineNum">     568 </span><span class="lineNoCov">          0 :       bool __ret = std::binary_search(_M_char_set.begin(), _M_char_set.end(),</span>
+<span class="lineNum">     569 </span><span class="lineNoCov">          0 :                                       _M_translator._M_translate(__ch));</span>
+<span class="lineNum">     570 </span><span class="lineNoCov">          0 :       if (!__ret)</span>
+<span class="lineNum">     571 </span>            :         {
+<span class="lineNum">     572 </span><span class="lineNoCov">          0 :           auto __s = _M_translator._M_transform(__ch);</span>
+<span class="lineNum">     573 </span><span class="lineNoCov">          0 :           for (auto&amp; __it : _M_range_set)</span>
+<span class="lineNum">     574 </span><span class="lineNoCov">          0 :             if (__it.first &lt;= __s &amp;&amp; __s &lt;= __it.second)</span>
+<span class="lineNum">     575 </span>            :               {
+<span class="lineNum">     576 </span><span class="lineNoCov">          0 :                 __ret = true;</span>
+<span class="lineNum">     577 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">     578 </span>            :               }
+<span class="lineNum">     579 </span><span class="lineNoCov">          0 :           if (_M_traits.isctype(__ch, _M_class_set))</span>
+<span class="lineNum">     580 </span><span class="lineNoCov">          0 :             __ret = true;</span>
+<span class="lineNum">     581 </span><span class="lineNoCov">          0 :           else if (std::find(_M_equiv_set.begin(), _M_equiv_set.end(),</span>
+<span class="lineNum">     582 </span>            :                              _M_traits.transform_primary(&amp;__ch, &amp;__ch+1))
+<span class="lineNum">     583 </span><span class="lineNoCov">          0 :                    != _M_equiv_set.end())</span>
+<span class="lineNum">     584 </span><span class="lineNoCov">          0 :             __ret = true;</span>
+<span class="lineNum">     585 </span>            :           else
+<span class="lineNum">     586 </span>            :             {
+<span class="lineNum">     587 </span><span class="lineNoCov">          0 :               for (auto&amp; __it : _M_neg_class_set)</span>
+<span class="lineNum">     588 </span><span class="lineNoCov">          0 :                 if (!_M_traits.isctype(__ch, __it))</span>
+<span class="lineNum">     589 </span>            :                   {
+<span class="lineNum">     590 </span><span class="lineNoCov">          0 :                     __ret = true;</span>
+<span class="lineNum">     591 </span><span class="lineNoCov">          0 :                     break;</span>
+<span class="lineNum">     592 </span>            :                   }
+<span class="lineNum">     593 </span>            :             }
+<span class="lineNum">     594 </span>            :         }
+<span class="lineNum">     595 </span><span class="lineNoCov">          0 :       if (_M_is_non_matching)</span>
+<span class="lineNum">     596 </span><span class="lineNoCov">          0 :         return !__ret;</span>
+<span class="lineNum">     597 </span>            :       else
+<span class="lineNum">     598 </span><span class="lineNoCov">          0 :         return __ret;</span>
+<span class="lineNum">     599 </span>            :     }
+<span class="lineNum">     600 </span>            : 
+<span class="lineNum">     601 </span>            : _GLIBCXX_END_NAMESPACE_VERSION
+<span class="lineNum">     602 </span>            : } // namespace __detail
+<span class="lineNum">     603 </span>            : } // namespace
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.12</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

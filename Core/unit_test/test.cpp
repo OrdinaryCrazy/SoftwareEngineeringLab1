@@ -15,17 +15,50 @@ TEST_CASE("standard test for lab1-b"){
     REQUIRE(result[1] == "end");
 }
 
-TEST_CASE("case n test"){
+TEST_CASE("specifiy word numbers--basic"){
     CoreImplement coreTest;
     std::vector<std::string> input = {"WORD","LIST","DIGITAL"};
     std::set<std::vector<std::string>> result;
     char head = 0;
     char tail = 0;
     int n=2;
+    int error_flag=0;
     
-    int len = coreTest.all_chain_word(input,result,n,head,tail);
+    int len = coreTest.all_chain_word(input,result,n,error_flag,head,tail);
     REQUIRE(len == 2);
 }
+
+TEST_CASE("specifiy word numbers--specify head and tail"){
+    CoreImplement coreTest;
+    std::vector<std::string> input = {"WORD","LIST","DIGITAL"};
+    std::set<std::vector<std::string>> result;
+    char head = 'w';
+    char tail = 'l';
+    int n=2;
+    int error_flag=0;
+
+    int len = coreTest.all_chain_word(input, result, n, error_flag, head, tail);
+    REQUIRE(len == 1);
+    auto list = *result.begin();
+    REQUIRE(list[0] == "word");
+    REQUIRE(list[1] == "digital");
+    
+    
+}
+
+TEST_CASE("specifiy word numbers--error"){
+    CoreImplement coreTest;
+    std::vector<std::string> input = {"WORD","LIST","DIGITAL"};
+    std::set<std::vector<std::string>> result;
+    char head = 0;
+    char tail = 0;
+    int n=1;
+    int error_flag=0;
+    
+    int len = coreTest.all_chain_word(input,result,n,error_flag,head,tail);
+    REQUIRE(error_flag == 1);
+}
+
 TEST_CASE("standard test for lab1 longest word"){
     CoreImplement coreTest;
     std::vector<std::string> input = {"Algebra", "Apple", "Zoo", "Elephant", "Under", "Fox", "Dog", "Moon", "Leaf", "Trick", "Pseudopseudohypoparathyroidism"};
