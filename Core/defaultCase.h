@@ -103,7 +103,7 @@ void search(){
     }
     // 对所有的节点进行深度优先搜索
     if (longestList.size()<2){
-        cout<<"No wordlist.\r\n";
+        std::cout<<"No wordlist.\r\n";
     }
     else{
         std::ofstream mycout("solution.txt");

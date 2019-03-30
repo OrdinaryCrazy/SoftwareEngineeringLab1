@@ -13,3 +13,15 @@ TEST_CASE("standard test"){
     int len = coreTest.gen_chain_word(input,result,head,tail);
     REQUIRE(len == 2);
 }
+
+TEST_CASE("case n test"){
+    CoreImplement coreTest;
+    std::vector<std::string> input = {"WORD","LIST","DIGITAL"};
+    std::set<std::vector<std::string>> result;
+    char head = 0;
+    char tail = 0;
+    int n=2;
+    
+    int len = coreTest.all_chain_word(input,result,n,head,tail);
+    REQUIRE(len == 2);
+}
