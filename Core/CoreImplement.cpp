@@ -3,7 +3,9 @@
 #include "specifiedWordNumbers.h"
 #include "defaultCase.h"
 #include <algorithm>
-// g++ -fno=rtti test.cpp ../CoreImplement.cpp 
+#include <setjmp.h>
+// g++ -fno-rtti test.cpp ../CoreImplement.cpp 
+
 int CoreImplement::gen_chain_word(std::vector<std::string> &words, std::vector<std::string> &result, char head, char tail)
 {   
     for(int i = 0;i < words.size();i++){
@@ -12,7 +14,8 @@ int CoreImplement::gen_chain_word(std::vector<std::string> &words, std::vector<s
 
     if(head == 0 && tail ==0){
         def::makeGraph(words,0);
-        def::search();
+        if(setjmp(def::buf) == 0)
+            def::search();
 
         result = def::longestList;
         return result.size();
@@ -21,7 +24,8 @@ int CoreImplement::gen_chain_word(std::vector<std::string> &words, std::vector<s
         if(head != 0 && tail == 0){
             signal(SIGALRM, sHoT::signalHandler);
             sHoT::initTimer(15);
-            sHoT::findPathWithSpecifiedHead(sHoT::buildGraph(words,true,true),head);
+            if(setjmp(sHoT::buf) == 0)
+                sHoT::findPathWithSpecifiedHead(sHoT::buildGraph(words,true,true),head);
 
             result = sHoT::resultPath;
             return result.size();
@@ -29,7 +33,8 @@ int CoreImplement::gen_chain_word(std::vector<std::string> &words, std::vector<s
         if(head == 0 && tail != 0){
             signal(SIGALRM, sHoT::signalHandler);
             sHoT::initTimer(15);
-            sHoT::findPathWithSpecifiedTail(sHoT::buildGraph(words,true,false),tail);
+            if(setjmp(sHoT::buf) == 0)
+                sHoT::findPathWithSpecifiedTail(sHoT::buildGraph(words,true,false),tail);
 
             result = sHoT::resultPath;
             return result.size();
@@ -37,7 +42,8 @@ int CoreImplement::gen_chain_word(std::vector<std::string> &words, std::vector<s
         if(head != 0 && tail != 0){
             signal(SIGALRM, sHoT::signalHandler);
             sHoT::initTimer(15);
-            sHoT::findPathWithSpecifiedHeadAndTail(sHoT::buildGraph(words,true,true),head,tail);
+            if(setjmp(sHoT::buf) == 0)
+                sHoT::findPathWithSpecifiedHeadAndTail(sHoT::buildGraph(words,true,true),head,tail);
 
             result = sHoT::resultPath;
             return result.size();
@@ -54,7 +60,8 @@ int CoreImplement::gen_chain_char(std::vector<std::string> &words, std::vector<s
 
     if(head == 0 && tail ==0){
         def::makeGraph(words,1);
-        def::search();
+        if(setjmp(def::buf) == 0)
+            def::search();
 
         result = def::longestList;
         return result.size();
@@ -63,7 +70,8 @@ int CoreImplement::gen_chain_char(std::vector<std::string> &words, std::vector<s
         if(head != 0 && tail == 0){
             signal(SIGALRM, sHoT::signalHandler);
             sHoT::initTimer(15);
-            sHoT::findPathWithSpecifiedHead(sHoT::buildGraph(words,false,true),head);
+            if(setjmp(sHoT::buf) == 0)
+                sHoT::findPathWithSpecifiedHead(sHoT::buildGraph(words,false,true),head);
 
             result = sHoT::resultPath;
             return result.size();
@@ -71,7 +79,8 @@ int CoreImplement::gen_chain_char(std::vector<std::string> &words, std::vector<s
         if(head == 0 && tail != 0){
             signal(SIGALRM, sHoT::signalHandler);
             sHoT::initTimer(15);
-            sHoT::findPathWithSpecifiedTail(sHoT::buildGraph(words,false,false),tail);
+            if(setjmp(sHoT::buf) == 0)
+                sHoT::findPathWithSpecifiedTail(sHoT::buildGraph(words,false,false),tail);
 
             result = sHoT::resultPath;
             return result.size();
@@ -79,7 +88,8 @@ int CoreImplement::gen_chain_char(std::vector<std::string> &words, std::vector<s
         if(head != 0 && tail != 0){
             signal(SIGALRM, sHoT::signalHandler);
             sHoT::initTimer(15);
-            sHoT::findPathWithSpecifiedHeadAndTail(sHoT::buildGraph(words,false,true),head,tail);
+            if(setjmp(sHoT::buf) == 0)
+                sHoT::findPathWithSpecifiedHeadAndTail(sHoT::buildGraph(words,false,true),head,tail);
 
             result = sHoT::resultPath;
             return result.size();
@@ -90,7 +100,7 @@ int CoreImplement::gen_chain_char(std::vector<std::string> &words, std::vector<s
 
 int CoreImplement::all_chain_word(std::vector<std::string> &words, std::set<std::vector<std::string>> &result, int n, char head, char tail){
     for(int i = 0;i < words.size();i++){
-        transform(words[i].begin(),words[i].end(),words[i].begin(),::toupper);
+        transform(words[i].begin(),words[i].end(),words[i].begin(),::tolower);
     }
 
     if(head && tail) sWN::request4(words, n, head,tail);
@@ -100,6 +110,10 @@ int CoreImplement::all_chain_word(std::vector<std::string> &words, std::set<std:
 
     result = sWN::result;
     return result.size();
+}
+
+std::vector<std::string> CoreImplement::preprocessingData(std::string crudeData){
+    return sHoT::preprocessingData(crudeData);
 }
 /**
 _declspec(dllexport)bool GetCore(void** _RtObject)

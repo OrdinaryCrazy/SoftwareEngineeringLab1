@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <sys/time.h>
 #include <signal.h>
+#include <setjmp.h>
+
 namespace sHoT{
     // graph datastructure
     struct edge{
@@ -28,6 +30,8 @@ namespace sHoT{
     int searchingWeight;                    //当前搜索路径的权重（长度）
     std::vector<std::string> resultPath;    //当前搜索过的最长路径（单词链）
     int resultWeight;                       //当前搜索过的最长路径的权重（长度）
+
+    jmp_buf buf;
 
     // build graph from crude string data
     node* buildGraph(std::vector<std::string> crudeData,bool mostWord = true,bool headOrder = true){
@@ -82,7 +86,9 @@ namespace sHoT{
         //超时处理函数：输出DFS当前查找到的最长单词链
         std::cout<<"Time limits. The word list output may not be the longest one."<<std::endl;
         printSolution();
-        exit(0);
+        //exit(0);
+        //return;
+        longjmp(buf,1);
     }
     void initTimer(int sec){
         //设置定时器，搜索sec秒后停止搜索

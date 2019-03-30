@@ -2,6 +2,8 @@
 #include <fstream>
 #include <sys/time.h>
 #include <signal.h>
+#include <setjmp.h>
+
 namespace def{
 struct node{
     int weight;
@@ -19,6 +21,9 @@ std::vector<std::string> longestList;
 // 存储至今最长的单词链
 int currentWeight,longestWeight;
 // 存储当前单词链和最长单词链的总权重
+
+jmp_buf buf;
+
 void makeGraph(std::vector<std::string> s,int type){
     // s是字符串向量，保存所有的单词；type是类型，0表示按单词数目，1表示按照字母数目
     for (int i=0;i<26;i++){
@@ -81,7 +86,9 @@ void signalHandler(int m){
     for (int i=0;i<longestList.size();i++){
         mycout<<longestList[i]<<std::endl;
     }
-    exit(0);
+    //exit(0);
+    //return;
+    longjmp(buf,1);
 }
 
 void initTimer(int sec){
