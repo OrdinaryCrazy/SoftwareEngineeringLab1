@@ -277,3 +277,16 @@ TEST_CASE("Time Exceed B"){
     //REQUIRE(result[1] == "xy");
     //REQUIRE(result[2] == "yz");
 }
+
+/*TEST_CASE("default case--error"){
+    //Longest list length<2
+    CoreImplement coreTest;
+    std::vector<std::string> input = {"APPLE","LEMON","ORANGE","STRAWBERRY"};
+    std::vector<std::string> result;
+    char head = 0;
+    char tail = 0;
+    
+    int len = coreTest.gen_chain_word(input,result,head,tail);
+    REQUIRE(len == 1);
+}*/
+
