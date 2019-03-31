@@ -77,6 +77,10 @@ namespace sHoT{
         return graph;
     }
     void printSolution(){
+        if(resultPath.size() < 2){
+            std::cout<<"Sorry for no finding of Wordlist."<<std::endl;
+            resultPath.clear();
+        }
         std::ofstream solutionOut("solution.txt");
         for(int i = 0;i < resultPath.size();i++){
             solutionOut<<resultPath[i]<<std::endl;
@@ -86,8 +90,6 @@ namespace sHoT{
         //超时处理函数：输出DFS当前查找到的最长单词链
         std::cout<<"Time limits. The word list output may not be the longest one."<<std::endl;
         printSolution();
-        //exit(0);
-        //return;
         longjmp(buf,1);
     }
     void initTimer(int sec){
@@ -125,7 +127,6 @@ namespace sHoT{
         if(searchingWeight > resultWeight){
             resultWeight = searchingWeight;
             resultPath.assign(searchingPath.begin(),searchingPath.end());
-            //resultPath.reserve(resultPath.size());
         }
     }
     // 固定结尾字母模式
@@ -188,7 +189,6 @@ namespace sHoT{
         }
     }
     std::vector<std::string> preprocessingData(std::string crudeData){
-        // std::cout<<crudeData<<std::endl;
         std::vector<std::string> wordList = std::vector<std::string>();
         char* charData = const_cast<char*>(crudeData.c_str());
         std::string stringData;
@@ -211,17 +211,8 @@ namespace sHoT{
             tokenPtr = strtok(NULL," ");
         }
         sort(wordList.begin(),wordList.end());
-        /*
-        for(int i = 0;i < wordList.size();i++)
-            std::cout<<wordList[i]<<std::endl;
-        std::cout<<std::endl;
-        */
         std::vector<std::string>::iterator iter = unique(wordList.begin(),wordList.end());
         wordList.erase(iter,wordList.end());
-        /*
-        for(int i = 0;i < wordList.size();i++)
-            std::cout<<wordList[i]<<std::endl;
-        */
         return wordList;
     }
 }
