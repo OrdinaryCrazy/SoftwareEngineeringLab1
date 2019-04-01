@@ -2,11 +2,11 @@
 CXX = g++
 
 TARGET = Wordlist
-LIBS = 	defaultCase.h\
-		specifiedHeadOrTail.h\
-		specifiedWordNumbers.h
+LIBS = 	Core/CoreImplement.h\
+		Core/exception.h\
 
-$(TARGET): 	main.cpp\
+$(TARGET): main.cpp\
+		Core/CoreImplement.cpp\
 			$(LIBS)	
 	@ $(CXX) $< -o $@ -std=c++11 --static
 

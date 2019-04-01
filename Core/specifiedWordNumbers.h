@@ -9,18 +9,13 @@ namespace sWN{
 
 
 std::set<std::vector<std::string>> result;
-int error_flag=0;
 bool used(std::string next, std::vector<std::string> v){
     for(std::string s:v)
         if(s == next) return true;
     return false;
 }
 void request4(std::vector<std::string> w, int n, char h=0, char t=0){
-    if(n<2){
-        std::cout<<"error: as defined, word list must have a length at least 2"<<std::endl;
-        error_flag = 1;
-        return;
-    }
+
     int size = w.size();
     std::set<std::vector<std::string>> a,b;
     std::unordered_map<std::string, std::vector<std::string>> adj;

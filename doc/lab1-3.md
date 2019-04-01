@@ -1,0 +1,17 @@
+# 实验报告
+## 处理的异常
++ text_preprocess
+  + 抛出文件无法打开异常
++ gen_chain_word
+  + 抛出words为空异常
+  + 抛出words非法异常(含有非字母字符)
+  + 抛出head和tail非法异常(非0且非字母)
++ gen_chain_char
+  + 抛出words为空异常
+  + 抛出words非法异常(含有非字母字符)
+  + 抛出head和tail非法异常(非0且非字母)
++ all_chain_word
+  + 抛出words为空异常
+  + 抛出words非法异常(含有非字母字符)
+  + 抛出head和tail非法异常(非0且非字母)
+  + 抛出n小于2的异常

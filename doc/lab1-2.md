@@ -385,7 +385,7 @@ ha hb hc hd he hf hg
 
 测试代码如下：
 
-![](../images/timelimit_test.png)
+![picture](../images/timelimit_test.png)
 
 
 

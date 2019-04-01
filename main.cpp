@@ -1,20 +1,11 @@
 // This is a Software Engineering Group Project
 // Contributor: DaiLu, WangHaoyu, ZhangJingtun
 // Last modified: 20190311 17:01
-#include "specifiedHeadOrTail.h"
-#include "specifiedWordNumbers.h"
-#include "defaultCase.h"
+#include "Core/CoreImplement.h"
+#include "Core/exception.h"
 #include <iostream>
-#include <algorithm>
 #include <vector> 
-#include <stdio.h>
-#include <stdlib.h>
-#include <fstream>
 #include <string.h>
-#include <cstring>
-#include <string>
-#include <sys/time.h>
-#include <signal.h>
 void usage(){
     std::string usage="Usage: Wordlist [arguments] <filename>\r\n\
 Mandatory arguments:\r\n\
@@ -26,13 +17,10 @@ Optional arguments:\r\n\
     (Note: -h and -t can be used at the same time)\r\n\
     -n <num>: Output all word lists containing <num> words.\r\n\
     (Note: -n must be used with -w)\r\n";
-    cout<<usage;
+    std::cout<<usage;
     exit(0);
 }
 int main (int argc, char*argv[]){
-    using namespace sHoT;
-    using namespace def;
-    using namespace std;
 
     bool mostChar = false;      //最多字母模式开关
     bool mostWord = false;      //最多单词模式开关
@@ -126,62 +114,37 @@ int main (int argc, char*argv[]){
         std::cout<< "Wrong argument usage." <<std::endl;
         usage();
     }
-    ifstream inFile(inputFile);
-    if(!inFile){
-        std::cout<<"Can not open data file."<<std::endl;
-        exit(0);
+    //处理命令行参数，拒绝所有非法的参数
+
+    CoreImplement coreTest;
+    std::vector<std::string> input;
+    try{
+        input = coreTest.text_preprocess(inputFile);
     }
-    std::string crudeString;    //从输入文件读取的原始内容
-    std::string tempString;
-    while(!inFile.eof()){
-        inFile>>tempString;
-        crudeString.append(tempString);
-        crudeString.append(" ");
+    catch(expt::exception ex){
+        std::cout<<ex.message<<std::endl;
+        usage();
     }
-    //通过数据预处理得到的字符串向量，作为各功能部件的数据接口输入
-    std::vector<std::string> crudeData = sHoT::preprocessingData(crudeString);
-    if (!fixedHead && !fixedTail && !fixedWordNum){
-        if (mostChar)   def::makeGraph(crudeData,1);
-        else    def::makeGraph(crudeData,0);
-        def::search();
-    }
-    if(fixedHead && !fixedTail && head <= 'z' && head >= 'a'){
-        signal(SIGALRM, sHoT::signalHandler);
-        sHoT::initTimer(15);
-        if(mostWord || (mostChar == false && mostWord == false)){
-            sHoT::findPathWithSpecifiedHead(sHoT::buildGraph(crudeData,true,true),head);
+    //从文件中读取并预处理输入文本，捕捉异常
+
+    try{
+        if (fixedWordNum){
+            std::set<std::vector<std::string>> result;
+            coreTest.all_chain_word(input,result,wordNum,head,tail);
         }
-        if(mostChar){
-            sHoT::findPathWithSpecifiedHead(sHoT::buildGraph(crudeData,false,true),head);
+        else if (mostWord){
+            std::vector<std::string> result;
+            coreTest.gen_chain_word(input,result,head,tail);
         }
-        sHoT::printSolution();
+        else if (mostChar){
+            std::vector<std::string> result;
+            coreTest.gen_chain_char(input,result,head,tail);
+        }
     }
-    if(!fixedHead && fixedTail && tail <= 'z' && tail >= 'a'){
-        signal(SIGALRM, sHoT::signalHandler);
-        sHoT::initTimer(15);
-        if(mostWord || (mostChar == false && mostWord == false)){
-            sHoT::findPathWithSpecifiedTail(sHoT::buildGraph(crudeData,true,false),tail);
-        }
-        if(mostChar){
-            sHoT::findPathWithSpecifiedTail(sHoT::buildGraph(crudeData,false,false),tail);
-        }
-        sHoT::printSolution();
+    catch(expt::exception ex){
+        std::cout<<ex.message<<std::endl;
+        usage();
     }
-    if(fixedHead && fixedTail && head <= 'z' && head >= 'a' && tail <= 'z' && tail >= 'a'){
-        signal(SIGALRM, sHoT::signalHandler);
-        sHoT::initTimer(15);
-        if(mostWord || (mostChar == false && mostWord == false)){
-            sHoT::findPathWithSpecifiedHeadAndTail(sHoT::buildGraph(crudeData,true,true),head,tail);
-        }
-        if(mostChar){
-            sHoT::findPathWithSpecifiedHeadAndTail(sHoT::buildGraph(crudeData,false,true),head,tail);
-        }
-        sHoT::printSolution();
-    }
-    if(fixedWordNum){
-        if(fixedHead && fixedTail) sWN::request4(crudeData, wordNum, head,tail);
-        else if(fixedHead) sWN::request4(crudeData, wordNum,head,0);
-        else if(fixedTail) sWN::request4(crudeData, wordNum,0,tail);
-        else sWN::request4(crudeData, wordNum);
-    }
+    //根据模式开关调用对应的API，并捕捉异常
+
 }

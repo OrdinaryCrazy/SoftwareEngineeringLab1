@@ -1,13 +1,15 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 #include "../CoreImplement.h"
+#include "../exception.h" 
 //=====================================================================================================================
 //========== DEATH WARNING: NO CHANGE OR MOVE TO THE FOLLOWING CODE WHICH WILL CAUSE SEGMENTATION FAULT ===============
 //=====================================================================================================================
+
 #include <sys/types.h>
 #include <unistd.h>
 #include <wait.h>
-#include <stdlib.h>   //for EXIT_SUCCESS
+#include <stdlib.h>   //for EXIT_SUCCESS 
 TEST_CASE("Time Exceed "){
     CoreImplement coreTest;
     std::ifstream inFile("./test/test_4.txt");
@@ -69,9 +71,11 @@ TEST_CASE("Time Exceed B"){
     else
         wait(&status);
 }
+
 //=====================================================================================================================
 //============================================= DEATH WARNING END =====================================================
 //=====================================================================================================================
+
 TEST_CASE("standard test for lab1-b"){
     CoreImplement coreTest;
     std::vector<std::string> input = {"END","OF","THE","WORLD"};
@@ -92,9 +96,8 @@ TEST_CASE("specifiy word numbers--basic"){
     char head = 0;
     char tail = 0;
     int n=2;
-    int error_flag=0;
     
-    int len = coreTest.all_chain_word(input,result,n,error_flag,head,tail);
+    int len = coreTest.all_chain_word(input,result,n,head,tail);
     REQUIRE(len == 2);
 }
 
@@ -105,28 +108,14 @@ TEST_CASE("specifiy word numbers--specify head and tail"){
     char head = 'w';
     char tail = 'l';
     int n=2;
-    int error_flag=0;
 
-    int len = coreTest.all_chain_word(input, result, n, error_flag, head, tail);
+    int len = coreTest.all_chain_word(input, result, n, head, tail);
     REQUIRE(len == 1);
     auto list = *result.begin();
     REQUIRE(list[0] == "word");
     REQUIRE(list[1] == "digital");
     
     
-}
-
-TEST_CASE("specifiy word numbers--error"){
-    CoreImplement coreTest;
-    std::vector<std::string> input = {"WORD","LIST","DIGITAL"};
-    std::set<std::vector<std::string>> result;
-    char head = 0;
-    char tail = 0;
-    int n=1;
-    int error_flag=0;
-    
-    int len = coreTest.all_chain_word(input,result,n,error_flag,head,tail);
-    REQUIRE(error_flag == 1);
 }
 
 TEST_CASE("standard test for lab1 longest word"){
@@ -317,3 +306,235 @@ TEST_CASE("fixed head case--error"){
     REQUIRE(len == 0);
 }
 
+TEST_CASE("right filename in text_preprocess"){
+    CoreImplement coreTest;
+    bool error=false;
+    std::vector<std::string> result;
+    try{
+        result=coreTest.text_preprocess("./test/test_2.txt");
+    }
+    catch(expt::exception ex){
+        error=true;
+    }
+    REQUIRE(!error);
+    REQUIRE(8==result.size());
+    REQUIRE(result[0]=="ab");
+    REQUIRE(result[1]=="add");
+    REQUIRE(result[2]=="bieiojiosjdfc");
+    REQUIRE(result[3]=="biufd");
+    REQUIRE(result[4]=="cd");
+    REQUIRE(result[5]=="d");
+    REQUIRE(result[6]=="daa");
+    REQUIRE(result[7]=="dcfaswc");
+}
+TEST_CASE("wrong filename in text_preprocess"){
+    CoreImplement coreTest;
+    bool error=false;
+    try{
+        coreTest.text_preprocess("./test/test_.txt");
+    }
+    catch(expt::exception ex){
+        error=true;
+        REQUIRE(ex.message=="Can not open data file.");
+        REQUIRE(ex.location=="text_preprocess");
+    }
+    REQUIRE(error);
+} 
+
+TEST_CASE("empty words in gen_chain_word"){
+    CoreImplement coreTest;
+    bool error=false;
+    try{
+        std::vector<std::string> input = {};
+        std::vector<std::string> result;
+        coreTest.gen_chain_word(input,result,0,0);
+    }
+    catch(expt::exception ex){
+        error=true;
+        REQUIRE(ex.message=="No element in words.");
+        REQUIRE(ex.location=="gen_chain_word");
+    }
+    REQUIRE(error);
+} 
+TEST_CASE("illegal element of words in gen_chain_word"){
+    CoreImplement coreTest;
+    bool error=false;
+    try{
+        std::vector<std::string> input = {"APPLE","LEM0N","ORANGE","STRAWBERRY"};
+        std::vector<std::string> result;
+        coreTest.gen_chain_word(input,result,0,0);
+    }
+    catch(expt::exception ex){
+        error=true;
+        REQUIRE(ex.message=="At least one element of words is illegal.");
+        REQUIRE(ex.location=="gen_chain_word");
+    }
+    REQUIRE(error);
+} 
+TEST_CASE("illegal head in gen_chain_word"){
+    CoreImplement coreTest;
+    bool error=false;
+    try{
+        std::vector<std::string> input = {"APPLE","LEMoN","ORANGE","STRAWBERRY"};
+        std::vector<std::string> result;
+        coreTest.gen_chain_word(input,result,1,0);
+    }
+    catch(expt::exception ex){
+        error=true;
+        REQUIRE(ex.message=="Illegal head.");
+        REQUIRE(ex.location=="gen_chain_word");
+    }
+    REQUIRE(error);
+} 
+TEST_CASE("illegal tail in gen_chain_word"){
+    CoreImplement coreTest;
+    bool error=false;
+    try{
+        std::vector<std::string> input = {"APPLE","LEMoN","ORANGE","STRAWBERRY"};
+        std::vector<std::string> result;
+        coreTest.gen_chain_word(input,result,0,1);
+    }
+    catch(expt::exception ex){
+        error=true;
+        REQUIRE(ex.message=="Illegal tail.");
+        REQUIRE(ex.location=="gen_chain_word");
+    }
+    REQUIRE(error);
+} 
+
+TEST_CASE("empty words in gen_chain_char"){
+    CoreImplement coreTest;
+    bool error=false;
+    try{
+        std::vector<std::string> input = {};
+        std::vector<std::string> result;
+        coreTest.gen_chain_char(input,result,0,0);
+    }
+    catch(expt::exception ex){
+        error=true;
+        REQUIRE(ex.message=="No element in words.");
+        REQUIRE(ex.location=="gen_chain_char");
+    }
+    REQUIRE(error);
+} 
+TEST_CASE("illegal element of words in gen_chain_char"){
+    CoreImplement coreTest;
+    bool error=false;
+    try{
+        std::vector<std::string> input = {"APPLE","LEM0N","ORANGE","STRAWBERRY"};
+        std::vector<std::string> result;
+        coreTest.gen_chain_char(input,result,0,0);
+    }
+    catch(expt::exception ex){
+        error=true;
+        REQUIRE(ex.message=="At least one element of words is illegal.");
+        REQUIRE(ex.location=="gen_chain_char");
+    }
+    REQUIRE(error);
+} 
+TEST_CASE("illegal head in gen_chain_char"){
+    CoreImplement coreTest;
+    bool error=false;
+    try{
+        std::vector<std::string> input = {"APPLE","LEMoN","ORANGE","STRAWBERRY"};
+        std::vector<std::string> result;
+        coreTest.gen_chain_char(input,result,1,0);
+    }
+    catch(expt::exception ex){
+        error=true;
+        REQUIRE(ex.message=="Illegal head.");
+        REQUIRE(ex.location=="gen_chain_char");
+    }
+    REQUIRE(error);
+} 
+TEST_CASE("illegal tail in gen_chain_char"){
+    CoreImplement coreTest;
+    bool error=false;
+    try{
+        std::vector<std::string> input = {"APPLE","LEMoN","ORANGE","STRAWBERRY"};
+        std::vector<std::string> result;
+        coreTest.gen_chain_char(input,result,0,1);
+    }
+    catch(expt::exception ex){
+        error=true;
+        REQUIRE(ex.message=="Illegal tail.");
+        REQUIRE(ex.location=="gen_chain_char");
+    }
+    REQUIRE(error);
+} 
+
+TEST_CASE("empty words in all_chain_word"){
+    CoreImplement coreTest;
+    bool error=false;
+    try{
+        std::vector<std::string> input = {};
+        std::set<std::vector<std::string>> result;
+        coreTest.all_chain_word(input,result,2,0,0);
+    }
+    catch(expt::exception ex){
+        error=true;
+        REQUIRE(ex.message=="No element in words.");
+        REQUIRE(ex.location=="all_chain_word");
+    }
+    REQUIRE(error);
+} 
+TEST_CASE("illegal element of words in all_chain_word"){
+    CoreImplement coreTest;
+    bool error=false;
+    try{
+        std::vector<std::string> input = {"APPLE","LEM0N","ORANGE","STRAWBERRY"};
+        std::set<std::vector<std::string>> result;
+        coreTest.all_chain_word(input,result,2,0,0);
+    }
+    catch(expt::exception ex){
+        error=true;
+        REQUIRE(ex.message=="At least one element of words is illegal.");
+        REQUIRE(ex.location=="all_chain_word");
+    }
+    REQUIRE(error);
+} 
+TEST_CASE("illegal head in all_chain_word"){
+    CoreImplement coreTest;
+    bool error=false;
+    try{
+        std::vector<std::string> input = {"APPLE","LEMoN","ORANGE","STRAWBERRY"};
+        std::set<std::vector<std::string>> result;
+        coreTest.all_chain_word(input,result,2,1,0);
+    }
+    catch(expt::exception ex){
+        error=true;
+        REQUIRE(ex.message=="Illegal head.");
+        REQUIRE(ex.location=="all_chain_word");
+    }
+    REQUIRE(error);
+} 
+TEST_CASE("illegal tail in all_chain_word"){
+    CoreImplement coreTest;
+    bool error=false;
+    try{
+        std::vector<std::string> input = {"APPLE","LEMoN","ORANGE","STRAWBERRY"};
+        std::set<std::vector<std::string>> result;
+        coreTest.all_chain_word(input,result,2,0,1);
+    }
+    catch(expt::exception ex){
+        error=true;
+        REQUIRE(ex.message=="Illegal tail.");
+        REQUIRE(ex.location=="all_chain_word");
+    }
+    REQUIRE(error);
+} 
+TEST_CASE("n<2 in all_chain_word"){
+    CoreImplement coreTest;
+    bool error=false;
+    try{
+        std::vector<std::string> input = {"APPLE","LEMoN","ORANGE","STRAWBERRY"};
+        std::set<std::vector<std::string>> result;
+        coreTest.all_chain_word(input,result,1,0,0);
+    }
+    catch(expt::exception ex){
+        error=true;
+        REQUIRE(ex.message=="As defined, word list must have a length at least 2.");
+        REQUIRE(ex.location=="all_chain_word");
+    }
+    REQUIRE(error);
+} 
