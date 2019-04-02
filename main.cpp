@@ -108,8 +108,7 @@ int main (int argc, char*argv[]){
             std::cout<< "Invalid argument." <<std::endl;
             usage();
         }
-    }
-    
+    }    
     if (mostChar==mostWord || (fixedWordNum &&  mostChar) ){
         std::cout<< "Wrong argument usage." <<std::endl;
         usage();

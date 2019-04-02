@@ -8,8 +8,7 @@
 #include <fstream>
 // g++ -fno-rtti test.cpp ../CoreImplement.cpp 
 
-int CoreImplement::gen_chain_word(std::vector<std::string> &words, std::vector<std::string> &result, char head, char tail)
-{   
+int CoreImplement::gen_chain_word(std::vector<std::string> &words, std::vector<std::string> &result, char head, char tail){   
     def::longestList.clear();
     sHoT::resultPath.clear();
     if (words.size()==0){
@@ -81,8 +80,7 @@ int CoreImplement::gen_chain_word(std::vector<std::string> &words, std::vector<s
     return result.size();
 }
 
-int CoreImplement::gen_chain_char(std::vector<std::string> &words, std::vector<std::string> &result, char head, char tail)
-{   
+int CoreImplement::gen_chain_char(std::vector<std::string> &words, std::vector<std::string> &result, char head, char tail){   
     def::longestList.clear();
     sHoT::resultPath.clear();
     if (words.size()==0){
@@ -124,7 +122,6 @@ int CoreImplement::gen_chain_char(std::vector<std::string> &words, std::vector<s
         def::makeGraph(words,1);
         if(setjmp(def::buf) == 0)
             def::search();
-
         result = def::longestList;
         
     }
@@ -229,16 +226,3 @@ std::vector<std::string> CoreImplement::text_preprocess(std::string inputFile) {
     //通过数据预处理得到的字符串向量，作为各功能部件的数据接口输入
     return sHoT::preprocessingData(crudeString);
 }
-
-std::vector<std::string> CoreImplement::preprocessingData(std::string crudeData){
-    return sHoT::preprocessingData(crudeData);
-}
-/**
-_declspec(dllexport)bool GetCore(void** _RtObject)
-{
-    Core* core = NULL;
-    core = new CoreImplement();
-    *_RtObject = (void*)core;
-    return true;
-}
-**/

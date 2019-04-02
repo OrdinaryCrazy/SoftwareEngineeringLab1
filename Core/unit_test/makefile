@@ -10,6 +10,7 @@ $(TARGET): 	test.cpp\
 			../CoreImplement.cpp\
 			$(LIBS)	
 	@ $(CXX) -fno-rtti test.cpp ../CoreImplement.cpp -o unit_test -std=c++11 --static --coverage -lgcov
+	@ echo "Compilation succeed."
 	@ ./unit_test  #"Time Exceed B" "Time Exceed "
 	@ gcov CoreImplement  >> gcov.line
 	@ lcov -b ./ -d ./ --gcov-tool /usr/bin/gcov -c -o CoreImplement.info >> lcov.line

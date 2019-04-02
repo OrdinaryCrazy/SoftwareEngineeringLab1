@@ -7,7 +7,7 @@
 #include <sys/time.h>
 #include <signal.h>
 #include <setjmp.h>
-
+#include "exception.h"
 namespace sHoT{
     // graph datastructure
     struct edge{
@@ -78,8 +78,10 @@ namespace sHoT{
     }
     void printSolution(){
         if(resultPath.size() < 2){
-            std::cout<<"Sorry for no finding of Wordlist."<<std::endl;
-            resultPath.clear();
+            expt::exception ex;
+            ex.location="printSolution";
+            ex.message="Sorry for no finding of Wordlist.";
+            throw ex;
         }
         std::ofstream solutionOut("solution.txt");
         for(int i = 0;i < resultPath.size();i++){

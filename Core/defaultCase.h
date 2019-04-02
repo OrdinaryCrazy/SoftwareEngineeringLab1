@@ -3,7 +3,7 @@
 #include <sys/time.h>
 #include <signal.h>
 #include <setjmp.h>
-
+#include "exception.h"
 namespace def{
 struct node{
     int weight;
@@ -110,9 +110,10 @@ void search(){
     }
     // 对所有的节点进行深度优先搜索
     if (longestList.size()<2){
-        std::cout<<"No wordlist.\r\n";
-        longestList.clear();
-        //longjmp(buf,1);
+        expt::exception ex;
+        ex.location="search";
+        ex.message="Sorry for no finding of Wordlist.";
+        throw ex;
     }
     else{
         std::ofstream mycout("solution.txt");

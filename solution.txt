@@ -1,4 +1,0 @@
-algebra
-apple
-elephant
-trick

@@ -12,20 +12,7 @@
 #include <stdlib.h>   //for EXIT_SUCCESS 
 TEST_CASE("Time Exceed "){
     CoreImplement coreTest;
-    std::ifstream inFile("./test/test_4.txt");
-    if(!inFile){
-        std::cout<<"Can not open data file."<<std::endl;
-        exit(0);
-    }
-    std::string crudeString;    //从输入文件读取的原始内容
-    std::string tempString;
-    while(!inFile.eof()){
-        inFile>>tempString;
-        crudeString.append(tempString);
-        crudeString.append(" ");
-    }
-    //通过数据预处理得到的字符串向量，作为各功能部件的数据接口输入
-    std::vector<std::string> input = coreTest.preprocessingData(crudeString);
+    std::vector<std::string> input = coreTest.text_preprocess("./test/test_4.txt");
     std::vector<std::string> result;
     char head = 'a';
     int len;
@@ -42,20 +29,7 @@ TEST_CASE("Time Exceed "){
 }
 TEST_CASE("Time Exceed B"){
     CoreImplement coreTest; 
-    std::ifstream inFile("./test/test_4.txt");
-    if(!inFile){
-        std::cout<<"Can not open data file."<<std::endl;
-        exit(0);
-    }
-    std::string crudeString;    //从输入文件读取的原始内容
-    std::string tempString;
-    while(!inFile.eof()){
-        inFile>>tempString;
-        crudeString.append(tempString);
-        crudeString.append(" ");
-    }
-    //通过数据预处理得到的字符串向量，作为各功能部件的数据接口输入
-    std::vector<std::string> input = coreTest.preprocessingData(crudeString);
+    std::vector<std::string> input = coreTest.text_preprocess("./test/test_4.txt");
     std::vector<std::string> result;
     char head = 0;
     char tail = 0;
@@ -230,24 +204,9 @@ TEST_CASE("standard test for lab1 longest char fixed head & tail"){
 
 TEST_CASE("Different Head and Time Exceed A"){
     CoreImplement coreTest;
-    std::ifstream inFile("./test/test_3.txt");
-    if(!inFile){
-        std::cout<<"Can not open data file."<<std::endl;
-        exit(0);
-    }
-    std::string crudeString;    //从输入文件读取的原始内容
-    std::string tempString;
-    while(!inFile.eof()){
-        inFile>>tempString;
-        crudeString.append(tempString);
-        crudeString.append(" ");
-    }
-    //通过数据预处理得到的字符串向量，作为各功能部件的数据接口输入
-    std::vector<std::string> input = coreTest.preprocessingData(crudeString);
+    std::vector<std::string> input = coreTest.text_preprocess("./test/test_3.txt");
     std::vector<std::string> result;
     char head = 'a';
-    //char tail = 0;
-
     int len = coreTest.gen_chain_char(input,result,head);
     REQUIRE(len == 25);
     REQUIRE(result[0] == "ab");
@@ -257,53 +216,14 @@ TEST_CASE("Different Head and Time Exceed A"){
 
 TEST_CASE("Different Head and Time Exceed B"){
     CoreImplement coreTest; 
-    std::ifstream inFile("./test/test_3.txt");
-    if(!inFile){
-        std::cout<<"Can not open data file."<<std::endl;
-        exit(0);
-    }
-    std::string crudeString;    //从输入文件读取的原始内容
-    std::string tempString;
-    while(!inFile.eof()){
-        inFile>>tempString;
-        crudeString.append(tempString);
-        crudeString.append(" ");
-    }
-    //通过数据预处理得到的字符串向量，作为各功能部件的数据接口输入
-    std::vector<std::string> input = coreTest.preprocessingData(crudeString);
+    std::vector<std::string> input = coreTest.text_preprocess("./test/test_3.txt");
     std::vector<std::string> result;
     char head = 'w';
-    //char tail = 0;
-
     int len = coreTest.gen_chain_char(input,result,head);
     REQUIRE(len == 3);
     REQUIRE(result[0] == "wx");
     REQUIRE(result[1] == "xy");
     REQUIRE(result[2] == "yz");
-}
-
-TEST_CASE("default case--error"){
-    //Longest list length<2
-    CoreImplement coreTest;
-    std::vector<std::string> input = {"APPLE","LEMON","ORANGE","STRAWBERRY"};
-    std::vector<std::string> result;
-    char head = 0;
-    char tail = 0;
-
-    int len = coreTest.gen_chain_word(input,result,head,tail);
-    REQUIRE(len == 0);
-}
-
-TEST_CASE("fixed head case--error"){
-    //Longest list length<2
-    CoreImplement coreTest;
-    std::vector<std::string> input = {"APPLE","LEMON","ORANGE","STRAWBERRY"};
-    std::vector<std::string> result;
-    char head = 'a';
-    char tail = 0;
-
-    int len = coreTest.gen_chain_word(input,result,head,tail);
-    REQUIRE(len == 0);
 }
 
 TEST_CASE("right filename in text_preprocess"){
@@ -535,6 +455,36 @@ TEST_CASE("n<2 in all_chain_word"){
         error=true;
         REQUIRE(ex.message=="As defined, word list must have a length at least 2.");
         REQUIRE(ex.location=="all_chain_word");
+    }
+    REQUIRE(error);
+} 
+TEST_CASE("No word list found in search"){
+    CoreImplement coreTest;
+    bool error=false;
+    try{
+        std::vector<std::string> input = {"APPLE"};
+        std::vector<std::string> result;
+        coreTest.gen_chain_word(input,result,0,0);
+    }
+    catch(expt::exception ex){
+        error=true;
+        REQUIRE(ex.message=="Sorry for no finding of Wordlist.");
+        REQUIRE(ex.location=="search");
+    }
+    REQUIRE(error);
+} 
+TEST_CASE("No word list found in printSolution"){
+    CoreImplement coreTest;
+    bool error=false;
+    try{
+        std::vector<std::string> input = {"APPLE","LEMoN","ORANGE","STRAWBERRY"};
+        std::vector<std::string> result;
+        coreTest.gen_chain_word(input,result,'o','e');
+    }
+    catch(expt::exception ex){
+        error=true;
+        REQUIRE(ex.message=="Sorry for no finding of Wordlist.");
+        REQUIRE(ex.location=="printSolution");
     }
     REQUIRE(error);
 } 
