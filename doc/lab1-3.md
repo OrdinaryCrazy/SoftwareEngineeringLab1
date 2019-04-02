@@ -121,11 +121,11 @@ struct exception {
   + 可能由gen_chain_word,gen_chain_char,all_chain_word三个函数抛出
 + words非法异常
   + words向量中的某个元素含有非字母字符
-  + message="At leastcuowu one element of words is illegal."
-  + 可能由gen_chain_wcuowuord,gen_chain_char,all_chain_word三个函数抛出cuowu
-+ head非法异常cuowu
-  + head既不是0又不是cuowu英文字母
-  + message="Illegal cuowuhead."
+  + message="At least one element of words is illegal."
+  + 可能由gen_chain_word,gen_chain_char,all_chain_word三个函数抛出
++ head非法异常
+  + head既不是0又不是英文字母
+  + message="Illegal head."
   + 可能由gen_chain_word,gen_chain_char,all_chain_word三个函数抛出
 + tail非法异常
   + tail既不是0又不是英文字母
