@@ -152,12 +152,75 @@ struct exception {
 在测试时，我们沿用了之前lab1-b中的测试样例，并针对新增的部分（文本处理API和异常处理）设计了新的测试样例。本次单元测试的代码覆盖率为100%，截图如下：  
 ![picture](../images/lab_c_coverage.png?raw=true)  
 ### 文本处理测试
-
++ 测试样例一：文件名正确。希望API能够正确分割输入，返回去重并排序后的单词。测试文件内容如下：
+```txt
+ab bieiojiosjdfc89biufd.
+cd76677667d8---
+dcfaswc/add,daa
+```
+&emsp;&emsp;测试代码如下:
+```C++
+TEST_CASE("right filename in text_preprocess"){
+    CoreImplement coreTest;
+    bool error=false;
+    std::vector<std::string> result;
+    try{
+        result=coreTest.text_preprocess("./test/test_2.txt");
+    }
+    catch(expt::exception ex){
+        error=true;
+    }
+    REQUIRE(!error);
+    REQUIRE(8==result.size());
+    REQUIRE(result[0]=="ab");
+    REQUIRE(result[1]=="add");
+    REQUIRE(result[2]=="bieiojiosjdfc");
+    REQUIRE(result[3]=="biufd");
+    REQUIRE(result[4]=="cd");
+    REQUIRE(result[5]=="d");
+    REQUIRE(result[6]=="daa");
+    REQUIRE(result[7]=="dcfaswc");
+}
+```
++ 测试样例二：文件名错误。希望API能够抛出文件不存在的异常。测试代码如下：
+```C++
+TEST_CASE("wrong filename in text_preprocess"){
+    CoreImplement coreTest;
+    bool error=false;
+    try{
+        coreTest.text_preprocess("./test/test_.txt");//该文件不存在
+    }
+    catch(expt::exception ex){
+        error=true;
+        REQUIRE(ex.message=="Can not open data file.");
+        REQUIRE(ex.location=="text_preprocess");
+    }
+    REQUIRE(error);
+} 
+```
 ### 异常处理测试
+针对每一种错误，我们都特意构建了测试样例，使其能够抛出对应的异常。在测试代码中将异常捕获，比较异常的信息与预期的是否相同。由于测试的代码较多，且各种情况的代码较为相似，在这里试举一例：
+```C++
+TEST_CASE("illegal element of words in all_chain_word"){
+    CoreImplement coreTest;
+    bool error=false;
+    try{
+        std::vector<std::string> input = {"APPLE","LEM0N","ORANGE","STRAWBERRY"};//注意单词lemon中的是数字0而不是字母o
+        std::set<std::vector<std::string>> result;
+        coreTest.all_chain_word(input,result,2,0,0);
+    }
+    catch(expt::exception ex){
+        error=true;
+        REQUIRE(ex.message=="At least one element of words is illegal.");
+        REQUIRE(ex.location=="all_chain_word");
+    }
+    REQUIRE(error);
+} 
+```
 ## 工程重构
 重构后的代码分为三部分：命令行参数处理、文本处理和单词链生成。
 ### 命令行参数处理
-根据命令行参数，控制各个开关，同时拒绝所有非法的命令行参数。由于这部分代码直接写在main函数中，不能向调用者抛出异常，所以使用异常机制的必要性不大。对于非法的命令行参数，将会直接在控制台输出错误信息和使用帮助，并结束程序。 
+根据命令行参数，控制各个开关，同时拒绝所有非法的命令行参数。由于这部分代码直接写在main函数中，不能向调用者抛出异常，所以使用异常机制的必要性不大。对于非法的命令行参数，将会直接在控制台输出错误信息和使用帮助，并结束程序。由于对命令行参数的处理，许多错误将在这里被发现(反馈更加及时)，而不是等到API抛出异常。
 ### 文本处理
 调用text_preprocess()这个API。由于它会抛出异常，需要对其进行捕获，向控制台输出异常的message和使用帮助，并结束程序。
 ### 单词链生成
